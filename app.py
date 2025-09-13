@@ -408,6 +408,8 @@ if st.sidebar.button("🚀 分析実行", type="primary"):
                             # 銘柄名を取得
                             stock_name = next((name for name, sym in japanese_stocks.items() if sym == symbol), symbol)
                             metrics['name'] = stock_name
+                            metrics['symbol'] = symbol
+                            metrics['stock_data'] = stock_data  # 株価データも保存
                             screened_stocks.append(metrics)
         else:
             # 少数銘柄の場合は従来の処理
@@ -428,6 +430,8 @@ if st.sidebar.button("🚀 分析実行", type="primary"):
                         metrics = analyzer.calculate_financial_metrics(stock_data)
                         if metrics and analyzer._meets_criteria(metrics, criteria):
                             metrics['name'] = stock_name
+                            metrics['symbol'] = symbol
+                            metrics['stock_data'] = stock_data  # 株価データも保存
                             screened_stocks.append(metrics)
                 except Exception as e:
                     error_count += 1
@@ -559,28 +563,38 @@ if hasattr(st.session_state, 'analysis_completed') and st.session_state.analysis
             # 動向分析ボタン
             if st.button("🔍 動向分析を実行", type="primary"):
                 with st.spinner("銘柄の動向分析中..."):
-                    # スクリーニング結果の銘柄データを取得
+                    # スクリーニング結果から既存のデータを再利用
                     stock_data_dict = {}
                     metrics_dict = {}
                     
                     for idx, stock in df.iterrows():
                         symbol = stock['symbol']
-                        # 株価データを取得
-                        stock_data = analyzer.get_stock_data(symbol)
-                        if stock_data and stock_data['data'] is not None:
-                            stock_data_dict[symbol] = stock_data
-                            # 財務指標を取得
-                            metrics = analyzer.calculate_financial_metrics(stock_data)
-                            if metrics:
-                                metrics_dict[symbol] = metrics
+                        
+                        # 保存された株価データを取得
+                        if 'stock_data' in stock and stock['stock_data'] is not None:
+                            stock_data_dict[symbol] = stock['stock_data']
+                            
+                            # 財務指標を再計算（動向分析用に最適化）
+                            metrics = {
+                                'per': stock.get('pe_ratio', 0),
+                                'pbr': stock.get('pb_ratio', 0),
+                                'roe': stock.get('roe', 0),
+                                'debt_ratio': stock.get('debt_to_equity', 0),
+                                'dividend_yield': stock.get('dividend_yield', 0)
+                            }
+                            metrics_dict[symbol] = metrics
                     
                     # 動向分析を実行
                     if stock_data_dict and metrics_dict:
-                        forecasts = forecast_analyzer.analyze_multiple_stocks(stock_data_dict, metrics_dict)
-                        st.session_state.forecasts = forecasts
-                        st.success(f"✅ {len(forecasts)}銘柄の動向分析が完了しました！")
+                        try:
+                            forecasts = forecast_analyzer.analyze_multiple_stocks(stock_data_dict, metrics_dict)
+                            st.session_state.forecasts = forecasts
+                            st.success(f"✅ {len(forecasts)}銘柄の動向分析が完了しました！")
+                        except Exception as e:
+                            st.error(f"❌ 動向分析中にエラーが発生しました: {str(e)}")
                     else:
-                        st.error("❌ 動向分析に必要なデータが取得できませんでした。")
+                        st.warning("⚠️ 動向分析に必要なデータが一部不足しています。")
+                        st.info("💡 ヒント: スクリーニングを再実行してから動向分析を試してください。")
             
             # 動向分析結果の表示
             if 'forecasts' in st.session_state and st.session_state.forecasts:
