@@ -163,7 +163,7 @@ if 'show_analysis_details' in st.session_state and st.session_state.show_analysi
             
             fig_sector = px.bar(sector_df, x='セクター', y='言及回数', 
                               title='セクター別ニュース言及回数')
-            st.plotly_chart(fig_sector, use_container_width=True)
+            st.plotly_chart(fig_sector, width="stretch")
         
         # キーワード分析
         st.markdown("#### 🔑 検出されたキーワード")
@@ -470,7 +470,7 @@ if hasattr(st.session_state, 'analysis_completed') and st.session_state.analysis
             display_df['配当利回り(%)'] = display_df['配当利回り(%)'].apply(lambda x: f"{x:.2f}%")
             display_df['負債比率'] = display_df['負債比率'].apply(lambda x: f"{x:.1f}")
             
-            st.dataframe(display_df, use_container_width=True)
+            st.dataframe(display_df, width="stretch")
             
             # CSVダウンロード
             csv = df.to_csv(index=False, encoding='utf-8-sig')
@@ -493,7 +493,7 @@ if hasattr(st.session_state, 'analysis_completed') and st.session_state.analysis
                                 hover_data=['name', 'dividend_yield', 'debt_to_equity'],
                                 title='PER vs PBR 散布図',
                                 labels={'pe_ratio': 'PER', 'pb_ratio': 'PBR', 'roe': 'ROE(%)'})
-                st.plotly_chart(fig1, use_container_width=True)
+                st.plotly_chart(fig1, width="stretch")
             
             with col2:
                 # ROE上位10銘柄
@@ -502,7 +502,7 @@ if hasattr(st.session_state, 'analysis_completed') and st.session_state.analysis
                             title='ROE上位10銘柄',
                             labels={'roe': 'ROE(%)', 'name': '銘柄名'})
                 fig2.update_xaxes(tickangle=45)
-                st.plotly_chart(fig2, use_container_width=True)
+                st.plotly_chart(fig2, width="stretch")
             
             # セクター別分析
             if len(df['sector'].unique()) > 1:
@@ -517,7 +517,7 @@ if hasattr(st.session_state, 'analysis_completed') and st.session_state.analysis
                             title='セクター別平均ROE',
                             orientation='h',
                             labels={'roe': '平均ROE(%)', 'sector': 'セクター'})
-                st.plotly_chart(fig3, use_container_width=True)
+                st.plotly_chart(fig3, width="stretch")
         
         with tab3:
             st.subheader("📋 分析レポート")
@@ -698,7 +698,7 @@ if hasattr(st.session_state, 'analysis_completed') and st.session_state.analysis
                             '横ばい': '#808080'
                         }
                     )
-                    st.plotly_chart(fig_forecast, use_container_width=True)
+                    st.plotly_chart(fig_forecast, width="stretch")
                 
                 # 信頼度分布
                 st.markdown("### 🎯 信頼度分布")
@@ -709,7 +709,7 @@ if hasattr(st.session_state, 'analysis_completed') and st.session_state.analysis
                     title="信頼度の分布",
                     labels={'x': '信頼度 (%)', 'y': '銘柄数'}
                 )
-                st.plotly_chart(fig_confidence, use_container_width=True)
+                st.plotly_chart(fig_confidence, width="stretch")
     
     else:
         st.warning("⚠️ 条件に合致する銘柄が見つかりませんでした。条件を緩和して再試行してください。")
