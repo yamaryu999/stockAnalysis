@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 from stock_analyzer import JapaneseStockAnalyzer
 from news_analyzer import NewsAnalyzer
 from investment_strategies import InvestmentStrategies
+from stock_forecast import StockForecastAnalyzer
 import time
 from datetime import datetime
 
@@ -33,9 +34,14 @@ def initialize_news_analyzer():
 def initialize_investment_strategies():
     return InvestmentStrategies()
 
+@st.cache_data
+def initialize_forecast_analyzer():
+    return StockForecastAnalyzer()
+
 analyzer = initialize_analyzer()
 news_analyzer = initialize_news_analyzer()
 investment_strategies = initialize_investment_strategies()
+forecast_analyzer = initialize_forecast_analyzer()
 
 # 自動提案機能
 st.sidebar.header("🤖 AI推奨設定")
@@ -441,7 +447,7 @@ if hasattr(st.session_state, 'analysis_completed') and st.session_state.analysis
         st.success(f"✅ {len(df)}銘柄が条件に合致しました！")
         
         # タブで結果を表示
-        tab1, tab2, tab3, tab4 = st.tabs(["📊 データ一覧", "📈 可視化", "📋 レポート", "🎯 おすすめ銘柄"])
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 データ一覧", "📈 可視化", "📋 レポート", "🎯 おすすめ銘柄", "🔮 動向予想"])
         
         with tab1:
             st.subheader("スクリーニング結果")
@@ -546,6 +552,150 @@ if hasattr(st.session_state, 'analysis_completed') and st.session_state.analysis
                         st.metric("セクター", stock['sector'])
                         st.metric("業界", stock['industry'])
                         st.metric("ベータ", f"{stock['beta']:.2f}")
+        
+        with tab5:
+            st.subheader("🔮 銘柄動向予想")
+            
+            # 動向分析ボタン
+            if st.button("🔍 動向分析を実行", type="primary"):
+                with st.spinner("銘柄の動向分析中..."):
+                    # スクリーニング結果の銘柄データを取得
+                    stock_data_dict = {}
+                    metrics_dict = {}
+                    
+                    for idx, stock in df.iterrows():
+                        symbol = stock['symbol']
+                        # 株価データを取得
+                        stock_data = analyzer.get_stock_data(symbol)
+                        if stock_data and stock_data['data'] is not None:
+                            stock_data_dict[symbol] = stock_data
+                            # 財務指標を取得
+                            metrics = analyzer.calculate_financial_metrics(stock_data)
+                            if metrics:
+                                metrics_dict[symbol] = metrics
+                    
+                    # 動向分析を実行
+                    if stock_data_dict and metrics_dict:
+                        forecasts = forecast_analyzer.analyze_multiple_stocks(stock_data_dict, metrics_dict)
+                        st.session_state.forecasts = forecasts
+                        st.success(f"✅ {len(forecasts)}銘柄の動向分析が完了しました！")
+                    else:
+                        st.error("❌ 動向分析に必要なデータが取得できませんでした。")
+            
+            # 動向分析結果の表示
+            if 'forecasts' in st.session_state and st.session_state.forecasts:
+                forecasts = st.session_state.forecasts
+                
+                # 予想サマリー
+                st.markdown("### 📊 予想サマリー")
+                bullish_count = len([f for f in forecasts if f['forecast'] in ['bullish', 'strong_bullish']])
+                bearish_count = len([f for f in forecasts if f['forecast'] in ['bearish', 'strong_bearish']])
+                neutral_count = len([f for f in forecasts if f['forecast'] == 'neutral'])
+                
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.metric("📈 上昇予想", bullish_count)
+                with col2:
+                    st.metric("📉 下落予想", bearish_count)
+                with col3:
+                    st.metric("➡️ 横ばい予想", neutral_count)
+                with col4:
+                    avg_confidence = sum([f['confidence'] for f in forecasts]) / len(forecasts)
+                    st.metric("🎯 平均信頼度", f"{avg_confidence:.1f}%")
+                
+                # 銘柄別詳細分析
+                st.markdown("### 🔍 銘柄別詳細分析")
+                
+                for forecast in forecasts:
+                    # 予想方向のアイコン
+                    if forecast['forecast'] in ['strong_bullish', 'bullish']:
+                        icon = "📈"
+                        color = "green"
+                    elif forecast['forecast'] in ['strong_bearish', 'bearish']:
+                        icon = "📉"
+                        color = "red"
+                    else:
+                        icon = "➡️"
+                        color = "gray"
+                    
+                    # 信頼度の色分け
+                    if forecast['confidence'] >= 70:
+                        confidence_color = "🟢"
+                    elif forecast['confidence'] >= 50:
+                        confidence_color = "🟡"
+                    else:
+                        confidence_color = "🔴"
+                    
+                    with st.expander(f"{icon} {forecast['symbol']} - {forecast['direction']}予想 {confidence_color}{forecast['confidence']:.0f}%"):
+                        # 基本情報
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.markdown(f"**予想方向:** {forecast['direction']}")
+                            st.markdown(f"**推奨アクション:** {forecast['action']}")
+                        with col2:
+                            st.markdown(f"**総合スコア:** {forecast['total_score']:.2f}")
+                            st.markdown(f"**分析日時:** {forecast['analysis_date']}")
+                        with col3:
+                            st.markdown(f"**信頼度:** {forecast['confidence']:.1f}%")
+                            if forecast['risk_factors']:
+                                st.markdown(f"**リスク要因:** {', '.join(forecast['risk_factors'])}")
+                        
+                        # 技術分析
+                        st.markdown("#### 📊 技術分析")
+                        tech = forecast['technical_analysis']
+                        st.markdown(f"**トレンド:** {tech['trend']} (スコア: {tech['score']})")
+                        for reason in tech['reasons']:
+                            st.write(f"• {reason}")
+                        
+                        # ファンダメンタル分析
+                        st.markdown("#### 💰 ファンダメンタル分析")
+                        fund = forecast['fundamental_analysis']
+                        st.markdown(f"**強度:** {fund['strength']} (スコア: {fund['score']})")
+                        for reason in fund['reasons']:
+                            st.write(f"• {reason}")
+                        
+                        # 市場環境分析
+                        st.markdown("#### 🌍 市場環境分析")
+                        market = forecast['market_analysis']
+                        st.markdown(f"**環境:** {market['environment']} (スコア: {market['score']})")
+                        for reason in market['reasons']:
+                            st.write(f"• {reason}")
+                        
+                        if 'nikkei_change' in market:
+                            st.markdown(f"**日経平均変化:** {market['nikkei_change']:.2f}%")
+                        if 'volatility' in market:
+                            st.markdown(f"**市場ボラティリティ:** {market['volatility']:.1f}%")
+                
+                # 予想分布チャート
+                st.markdown("### 📊 予想分布")
+                forecast_counts = {}
+                for forecast in forecasts:
+                    direction = forecast['direction']
+                    forecast_counts[direction] = forecast_counts.get(direction, 0) + 1
+                
+                if forecast_counts:
+                    fig_forecast = px.pie(
+                        values=list(forecast_counts.values()),
+                        names=list(forecast_counts.keys()),
+                        title="予想方向の分布",
+                        color_discrete_map={
+                            '上昇': '#2E8B57',
+                            '下落': '#DC143C',
+                            '横ばい': '#808080'
+                        }
+                    )
+                    st.plotly_chart(fig_forecast, use_container_width=True)
+                
+                # 信頼度分布
+                st.markdown("### 🎯 信頼度分布")
+                confidence_data = [f['confidence'] for f in forecasts]
+                fig_confidence = px.histogram(
+                    x=confidence_data,
+                    nbins=10,
+                    title="信頼度の分布",
+                    labels={'x': '信頼度 (%)', 'y': '銘柄数'}
+                )
+                st.plotly_chart(fig_confidence, use_container_width=True)
     
     else:
         st.warning("⚠️ 条件に合致する銘柄が見つかりませんでした。条件を緩和して再試行してください。")
