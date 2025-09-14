@@ -24,6 +24,71 @@ class JapaneseStockAnalyzer:
         self.ticker_data = {}
         self.analysis_results = pd.DataFrame()
         
+        # 高優先度銘柄リスト（流動性の高い銘柄）
+        self.high_priority_stocks = [
+            '7203.T',  # トヨタ自動車
+            '6758.T',  # ソニー
+            '9984.T',  # ソフトバンクグループ
+            '9434.T',  # ソフトバンク
+            '6861.T',  # キーエンス
+            '4063.T',  # 信越化学工業
+            '8306.T',  # 三菱UFJフィナンシャル・グループ
+            '8316.T',  # 三井住友フィナンシャルグループ
+            '8035.T',  # 東京エレクトロン
+            '6954.T',  # ファナック
+            '6981.T',  # 村田製作所
+            '4519.T',  # 中外製薬
+            '4503.T',  # アステラス製薬
+            '4568.T',  # 第一三共
+            '6098.T',  # リクルートホールディングス
+            '7974.T',  # 任天堂
+            '6503.T',  # 三菱電機
+            '6501.T',  # 日立製作所
+            '6502.T',  # 東芝
+            '7732.T',  # トプコン
+            '7267.T',  # ホンダ
+            '7269.T',  # スズキ
+            '7201.T',  # 日産自動車
+            '8411.T',  # みずほフィナンシャルグループ
+            '8601.T',  # 大和証券グループ本社
+            '4502.T',  # 武田薬品工業
+            '4183.T',  # 三井化学
+            '4043.T',  # トクヤマ
+            '1605.T',  # 国際石油開発帝石
+            '5019.T',  # 出光興産
+            '5020.T',  # JXTGホールディングス
+            '5401.T',  # 日本製鉄
+            '5406.T',  # 神戸製鋼所
+            '5713.T',  # 住友金属鉱山
+        ]
+        
+        # セクターリーダー銘柄
+        self.sector_leaders = {
+            'IT・通信': ['6758.T', '9434.T', '9984.T', '6098.T', '7974.T'],
+            '自動車': ['7203.T', '7267.T', '7269.T', '7201.T'],
+            '金融': ['8306.T', '8316.T', '8411.T', '8601.T'],
+            '製造業': ['6861.T', '8035.T', '6954.T', '6981.T'],
+            'ヘルスケア': ['4519.T', '4503.T', '4568.T', '4502.T'],
+            '化学': ['4063.T', '4183.T', '4043.T'],
+            'エネルギー': ['1605.T', '5019.T', '5020.T'],
+            '素材': ['5401.T', '5406.T', '5713.T']
+        }
+    
+    def get_high_priority_stocks(self):
+        """高優先度銘柄（流動性の高い銘柄）を取得"""
+        return self.high_priority_stocks
+    
+    def get_sector_leaders(self, sector=None):
+        """セクターリーダー銘柄を取得"""
+        if sector:
+            return self.sector_leaders.get(sector, [])
+        return self.sector_leaders
+    
+    def get_optimized_stock_list(self, max_stocks=50):
+        """最適化された銘柄リストを取得（レート制限対応）"""
+        # 高優先度銘柄から指定数まで取得
+        return self.high_priority_stocks[:max_stocks]
+        
     def get_all_tse_stocks(self):
         """東京証券取引所の全銘柄を取得"""
         all_stocks = {}
@@ -251,18 +316,26 @@ class JapaneseStockAnalyzer:
             print(f"データ取得エラー {symbol}: {e}")
             return None
     
-    def get_stock_data_batch(self, symbols, period="1y", max_workers=3):
+    def get_stock_data_batch(self, symbols, period="1y", max_workers=2):
         """複数銘柄の株価データを並列取得（レート制限対応）"""
         results = {}
         
         def fetch_single_stock(symbol):
-            try:
-                # レート制限を避けるために少し待機
-                time.sleep(0.1)
-                return symbol, self.get_stock_data(symbol, period)
-            except Exception as e:
-                print(f"バッチ取得エラー {symbol}: {e}")
-                return symbol, None
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    # レート制限を避けるために待機時間を増加
+                    time.sleep(0.2 + attempt * 0.1)
+                    return symbol, self.get_stock_data(symbol, period)
+                except Exception as e:
+                    if "Rate limited" in str(e) and attempt < max_retries - 1:
+                        print(f"レート制限エラー {symbol}, リトライ {attempt + 1}/{max_retries}")
+                        time.sleep(1.0 + attempt * 0.5)  # 指数バックオフ
+                        continue
+                    else:
+                        print(f"バッチ取得エラー {symbol}: {e}")
+                        return symbol, None
+            return symbol, None
         
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             # 各銘柄のデータ取得を並列実行
