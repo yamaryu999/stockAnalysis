@@ -1,0 +1,39 @@
+# MCP Browser Configuration for Chrome
+browser:
+  type: chrome
+  headless: true
+  window_size: "1920,1080"
+  user_agent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+
+# Chrome specific settings
+chrome:
+  executable_path: null  # Will be auto-detected by webdriver-manager
+  options:
+    - "--no-sandbox"
+    - "--disable-dev-shm-usage"
+    - "--disable-gpu"
+    - "--disable-extensions"
+    - "--disable-plugins"
+    - "--disable-images"  # Optional: for faster loading
+
+# MCP Server settings
+server:
+  host: "localhost"
+  port: 3000
+  timeout: 30
+
+# Browser automation settings
+automation:
+  implicit_wait: 10
+  page_load_timeout: 30
+  script_timeout: 30
+
+# Security settings
+security:
+  allow_insecure_certs: false
+  accept_ssl_certs: true
+
+# Logging
+logging:
+  level: "INFO"
+  log_file: "logs/browser_mcp.log"

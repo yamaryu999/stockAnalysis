@@ -1,0 +1,464 @@
+/* 🚀 日本株価分析ツール - レスポンシブデザイン改善版 */
+
+/* ===== ベーススタイル ===== */
+:root {
+    /* カラーパレット */
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --accent-color: #f093fb;
+    --success-color: #4CAF50;
+    --warning-color: #FF9800;
+    --error-color: #F44336;
+    --text-color: #ffffff;
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #1a1a2e;
+    --bg-tertiary: #16213e;
+    
+    /* スペーシング */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-xxl: 3rem;
+    
+    /* ブレークポイント */
+    --mobile: 768px;
+    --tablet: 1024px;
+    --desktop: 1200px;
+    --large-desktop: 1440px;
+}
+
+/* ===== グローバルスタイル ===== */
+.main { 
+    padding: 0 !important; 
+}
+
+.stApp { 
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 25%, var(--bg-tertiary) 50%, #0f3460 75%, #533483 100%); 
+    color: var(--text-color); 
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ===== カスタムスクロールバー ===== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+}
+
+/* ===== メインヘッダー - レスポンシブ対応 ===== */
+.main-header { 
+    background: rgba(0, 0, 0, 0.3); 
+    backdrop-filter: blur(30px); 
+    border: 2px solid rgba(102, 126, 234, 0.3); 
+    padding: var(--spacing-xl); 
+    border-radius: 25px; 
+    margin-bottom: var(--spacing-xl); 
+    text-align: center; 
+    color: white; 
+    box-shadow: 
+        0 0 50px rgba(102, 126, 234, 0.3),
+        inset 0 0 50px rgba(102, 126, 234, 0.1); 
+    position: relative; 
+    overflow: hidden; 
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+.main-header h1 { 
+    margin: 0; 
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-weight: 800; 
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+    background-clip: text; 
+    text-shadow: 0 0 30px rgba(102, 126, 234, 0.5); 
+}
+
+.main-header p { 
+    margin: var(--spacing-sm) 0 0 0; 
+    font-size: clamp(0.9rem, 2vw, 1.3rem);
+    opacity: 0.9; 
+    font-weight: 300; 
+}
+
+@keyframes glow {
+    from {
+        box-shadow: 
+            0 0 50px rgba(102, 126, 234, 0.3),
+            inset 0 0 50px rgba(102, 126, 234, 0.1);
+    }
+    to {
+        box-shadow: 
+            0 0 80px rgba(102, 126, 234, 0.5),
+            inset 0 0 80px rgba(102, 126, 234, 0.2);
+    }
+}
+
+/* ===== サイドバー - レスポンシブ対応 ===== */
+.css-1d391kg { 
+    background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%); 
+    backdrop-filter: blur(20px); 
+    border-right: 1px solid rgba(255, 255, 255, 0.1); 
+}
+
+.sidebar-header { 
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%); 
+    backdrop-filter: blur(20px); 
+    padding: var(--spacing-lg); 
+    border-radius: 15px; 
+    margin-bottom: var(--spacing-lg); 
+    text-align: center; 
+    color: white; 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+}
+
+/* ===== カードスタイル - レスポンシブ対応 ===== */
+.metric-card { 
+    background: rgba(255, 255, 255, 0.05); 
+    backdrop-filter: blur(20px); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    padding: var(--spacing-lg); 
+    border-radius: 20px; 
+    color: white; 
+    text-align: center; 
+    margin: var(--spacing-md) 0; 
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); 
+    transition: all 0.3s ease; 
+    will-change: transform;
+}
+
+.metric-card:hover { 
+    transform: translateY(-5px); 
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4); 
+}
+
+/* ===== ステータスカード ===== */
+.success-card { 
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(69, 160, 73, 0.2) 100%); 
+    backdrop-filter: blur(20px); 
+    border: 1px solid rgba(76, 175, 80, 0.3); 
+    padding: var(--spacing-lg); 
+    border-radius: 20px; 
+    color: white; 
+    text-align: center; 
+    margin: var(--spacing-md) 0; 
+    box-shadow: 0 8px 32px rgba(76, 175, 80, 0.2); 
+}
+
+.warning-card { 
+    background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(245, 124, 0, 0.2) 100%); 
+    backdrop-filter: blur(20px); 
+    border: 1px solid rgba(255, 152, 0, 0.3); 
+    padding: var(--spacing-lg); 
+    border-radius: 20px; 
+    color: white; 
+    text-align: center; 
+    margin: var(--spacing-md) 0; 
+    box-shadow: 0 8px 32px rgba(255, 152, 0, 0.2); 
+}
+
+.error-card { 
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.2) 0%, rgba(211, 47, 47, 0.2) 100%); 
+    backdrop-filter: blur(20px); 
+    border: 1px solid rgba(244, 67, 54, 0.3); 
+    padding: var(--spacing-lg); 
+    border-radius: 20px; 
+    color: white; 
+    text-align: center; 
+    margin: var(--spacing-md) 0; 
+    box-shadow: 0 8px 32px rgba(244, 67, 54, 0.2); 
+}
+
+/* ===== タブスタイル - レスポンシブ対応 ===== */
+.stTabs [data-baseweb="tab-list"] { 
+    gap: 8px; 
+    background: rgba(255, 255, 255, 0.05); 
+    backdrop-filter: blur(20px); 
+    border-radius: 15px; 
+    padding: 8px; 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    flex-wrap: wrap;
+}
+
+.stTabs [data-baseweb="tab"] { 
+    height: auto;
+    min-height: 50px;
+    white-space: pre-wrap; 
+    background: rgba(255, 255, 255, 0.05); 
+    border-radius: 12px; 
+    gap: 8px; 
+    padding: var(--spacing-sm) var(--spacing-md); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    transition: all 0.3s ease; 
+    font-weight: 500; 
+    font-size: clamp(0.8rem, 2vw, 1rem);
+}
+
+.stTabs [data-baseweb="tab"]:hover { 
+    background: rgba(255, 255, 255, 0.1); 
+    transform: translateY(-2px); 
+}
+
+.stTabs [aria-selected="true"] { 
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); 
+    color: white; 
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); 
+    transform: translateY(-2px); 
+}
+
+/* ===== ボタンスタイル - レスポンシブ対応 ===== */
+.stButton > button { 
+    width: 100%; 
+    border-radius: 25px; 
+    border: none; 
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); 
+    color: white; 
+    font-weight: 600; 
+    padding: var(--spacing-sm) var(--spacing-lg); 
+    transition: all 0.3s ease; 
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); 
+    position: relative; 
+    overflow: hidden; 
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    min-height: 44px; /* タッチフレンドリー */
+}
+
+.stButton > button::before { 
+    content: ""; 
+    position: absolute; 
+    top: 0; 
+    left: -100%; 
+    width: 100%; 
+    height: 100%; 
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); 
+    transition: left 0.5s; 
+}
+
+.stButton > button:hover::before { 
+    left: 100%; 
+}
+
+.stButton > button:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5); 
+}
+
+/* ===== アクセシビリティ改善 ===== */
+.stButton > button:focus {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.metric-card:focus-within {
+    border: 2px solid var(--primary-color);
+}
+
+.stTabs [data-baseweb="tab"]:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 1px;
+}
+
+/* ===== 高コントラストモード対応 ===== */
+@media (prefers-contrast: high) {
+    .main-header {
+        background: rgba(0, 0, 0, 0.8);
+        border: 2px solid #ffffff;
+    }
+    
+    .metric-card {
+        background: rgba(0, 0, 0, 0.8);
+        border: 2px solid #ffffff;
+    }
+    
+    .stButton > button {
+        background: #000000;
+        border: 2px solid #ffffff;
+    }
+}
+
+/* ===== モーション軽減設定 ===== */
+@media (prefers-reduced-motion: reduce) {
+    .main-header {
+        animation: none;
+    }
+    
+    .metric-card:hover {
+        transform: none;
+    }
+    
+    .stButton > button:hover {
+        transform: none;
+    }
+    
+    .stTabs [data-baseweb="tab"]:hover {
+        transform: none;
+    }
+}
+
+/* ===== レスポンシブブレークポイント ===== */
+
+/* モバイル (768px以下) */
+@media (max-width: 768px) {
+    .main-header {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .main-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .main-header p {
+        font-size: 0.9rem;
+    }
+    
+    .metric-card {
+        margin: var(--spacing-sm) 0;
+        padding: var(--spacing-md);
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 45px;
+        font-size: 0.8rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    .stButton > button {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.9rem;
+    }
+    
+    .sidebar-header {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+}
+
+/* タブレット (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .main-header {
+        padding: var(--spacing-lg);
+    }
+    
+    .main-header h1 {
+        font-size: 2rem;
+    }
+    
+    .main-header p {
+        font-size: 1.1rem;
+    }
+    
+    .metric-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 55px;
+        font-size: 0.9rem;
+    }
+}
+
+/* デスクトップ (1025px - 1200px) */
+@media (min-width: 1025px) and (max-width: 1200px) {
+    .main-header {
+        padding: var(--spacing-xl);
+    }
+    
+    .main-header h1 {
+        font-size: 2.5rem;
+    }
+    
+    .main-header p {
+        font-size: 1.2rem;
+    }
+}
+
+/* 大型デスクトップ (1201px以上) */
+@media (min-width: 1201px) {
+    .main-header {
+        padding: var(--spacing-xxl);
+    }
+    
+    .main-header h1 {
+        font-size: 3rem;
+    }
+    
+    .main-header p {
+        font-size: 1.3rem;
+    }
+}
+
+/* ===== ダークモード対応 ===== */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-color: #ffffff;
+        --bg-primary: #0a0a0a;
+        --bg-secondary: #1a1a2e;
+        --bg-tertiary: #16213e;
+    }
+}
+
+/* ===== ライトモード対応 ===== */
+@media (prefers-color-scheme: light) {
+    :root {
+        --text-color: #333333;
+        --bg-primary: #f5f5f5;
+        --bg-secondary: #ffffff;
+        --bg-tertiary: #f0f0f0;
+    }
+    
+    .stApp {
+        background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 25%, var(--bg-tertiary) 50%, #e0e0e0 75%, #d0d0d0 100%);
+        color: var(--text-color);
+    }
+    
+    .main-header {
+        background: rgba(255, 255, 255, 0.3);
+        border: 2px solid rgba(102, 126, 234, 0.5);
+        color: var(--text-color);
+    }
+    
+    .metric-card {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        color: var(--text-color);
+    }
+}
+
+/* ===== 印刷対応 ===== */
+@media print {
+    .main-header {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+        box-shadow: none !important;
+    }
+    
+    .metric-card {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+        box-shadow: none !important;
+    }
+    
+    .stButton > button {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+    }
+}

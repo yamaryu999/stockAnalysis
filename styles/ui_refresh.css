@@ -1,0 +1,230 @@
+/* Modern UI refresh for the Japan Stock Analysis tool */
+:root {
+  --brand-primary: #1f3ae0;
+  --brand-primary-dark: #142499;
+  --brand-primary-light: #314eff;
+  --brand-accent: #00c897;
+  --brand-surface: #0f111a;
+  --brand-surface-alt: #161927;
+  --brand-border: rgba(255, 255, 255, 0.08);
+  --brand-text: rgba(255, 255, 255, 0.88);
+  --brand-text-muted: rgba(255, 255, 255, 0.6);
+  --brand-shadow: 0 18px 40px rgba(17, 21, 45, 0.45);
+}
+
+div[data-testid="stAppViewContainer"] {
+  background: radial-gradient(circle at 0% 0%, rgba(38, 53, 255, 0.35), transparent 55%),
+              radial-gradient(circle at 100% 0%, rgba(0, 200, 151, 0.28), transparent 45%),
+              var(--brand-surface);
+}
+
+div[data-testid="stSidebar"] {
+  background: rgba(15, 17, 26, 0.85) !important;
+  backdrop-filter: blur(18px);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hero
+{
+  border-radius: 24px;
+  padding: 32px;
+  background: linear-gradient(135deg, rgba(31, 58, 224, 0.85), rgba(20, 36, 153, 0.9));
+  color: white;
+  box-shadow: var(--brand-shadow);
+  margin-bottom: 28px;
+}
+
+.hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.hero__title {
+  margin: 18px 0 12px 0;
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.hero__subtitle {
+  margin: 0;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.action-card {
+  position: relative;
+  padding: 22px 24px;
+  border-radius: 20px;
+  background: var(--brand-surface-alt);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 12px 30px rgba(10, 12, 22, 0.35);
+  color: var(--brand-text);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.action-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.action-card h4 {
+  margin: 0 0 6px 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.action-card p {
+  margin: 0 0 18px 0;
+  color: var(--brand-text-muted);
+  font-size: 0.92rem;
+}
+
+.action-card button[data-testid="stBaseButton"] {
+  width: 100%;
+  justify-content: center;
+  border-radius: 14px !important;
+  border: none;
+  padding: 12px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--brand-primary);
+  color: white;
+  box-shadow: 0 12px 24px rgba(31, 58, 224, 0.35);
+}
+
+.action-card button[data-testid="stBaseButton"]:hover {
+  background: var(--brand-primary-light);
+}
+
+.summary-block {
+  margin-top: 12px;
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(17, 20, 33, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.summary-block__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.summary-block__title h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--brand-text);
+}
+
+.metric-card {
+  border-radius: 18px;
+  padding: 18px;
+  background: linear-gradient(145deg, rgba(31, 58, 224, 0.12), rgba(31, 58, 224, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--brand-text);
+  box-shadow: 0 14px 28px rgba(10, 12, 22, 0.35);
+}
+
+.metric-card strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--brand-text-muted);
+}
+
+.metric-card span {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.recommendation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.recommendation-card {
+  border-radius: 18px;
+  padding: 18px;
+  background: rgba(15, 17, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--brand-text);
+  box-shadow: 0 10px 24px rgba(17, 21, 45, 0.35);
+  transition: transform 0.2s ease;
+}
+
+.recommendation-card:hover {
+  transform: translateY(-3px);
+}
+
+.recommendation-card__symbol {
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand-text-muted);
+}
+
+.recommendation-card__name {
+  margin: 6px 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.recommendation-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--brand-text-muted);
+}
+
+.recommendation-card__score {
+  font-weight: 700;
+  color: var(--brand-accent);
+}
+
+.market-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.market-chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(0, 200, 151, 0.12);
+  border: 1px solid rgba(0, 200, 151, 0.22);
+  color: #54ffd4;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 24px;
+  }
+  .action-card {
+    padding: 18px;
+  }
+  .summary-block {
+    padding: 18px;
+  }
+}

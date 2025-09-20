@@ -1,307 +1,599 @@
+"""
+ニュース分析機能
+複数のニュースソースから情報を収集し、センチメント分析を行う
+"""
+
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import numpy as np
 from datetime import datetime, timedelta
+from typing import Dict, List, Optional
 import re
-from typing import Dict, List, Tuple
+import time
+import json
+from urllib.parse import urljoin, urlparse
 import warnings
 warnings.filterwarnings('ignore')
 
 class NewsAnalyzer:
+    """ニュース分析を行うクラス"""
+    
     def __init__(self):
-        self.headers = {
+        self.session = requests.Session()
+        self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        })
+        self.cache = {}
+        self.cache_duration = 3600  # 1時間
+        
+        # センチメント分析用の辞書
+        self.positive_words = {
+            '上昇', '成長', '好調', '改善', '増加', '利益', '成功', '強気', '買い', '推奨',
+            'up', 'rise', 'growth', 'profit', 'gain', 'positive', 'bullish', 'buy'
         }
         
-    def get_financial_news(self) -> List[Dict]:
-        """金融・経済ニュースを取得"""
-        news_data = []
-        
-        # サンプルニュースデータ（実際のニュース取得が失敗した場合のフォールバック）
-        sample_news = [
-            {'title': '日経平均、小幅上昇で取引終了', 'source': 'サンプル', 'timestamp': datetime.now()},
-            {'title': '米国株価指数、好調な企業業績で上昇', 'source': 'サンプル', 'timestamp': datetime.now()},
-            {'title': '円安進行、輸出企業に追い風', 'source': 'サンプル', 'timestamp': datetime.now()},
-            {'title': 'AI関連株、技術革新で注目集める', 'source': 'サンプル', 'timestamp': datetime.now()},
-            {'title': 'ESG投資、持続可能性重視の流れ加速', 'source': 'サンプル', 'timestamp': datetime.now()}
-        ]
-        
-        try:
-            # 日経新聞の経済ニュース
-            nikkei_url = "https://www.nikkei.com/markets/"
-            response = requests.get(nikkei_url, headers=self.headers, timeout=5)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.content, 'html.parser')
-                # ニュースタイトルを抽出（実際のサイト構造に応じて調整が必要）
-                news_items = soup.find_all(['h3', 'h4', 'a'], class_=re.compile(r'title|headline|news'))
-                for item in news_items[:5]:  # 最新5件
-                    title = item.get_text(strip=True)
-                    if title and len(title) > 10:
-                        news_data.append({
-                            'title': title,
-                            'source': '日経新聞',
-                            'timestamp': datetime.now()
-                        })
-        except Exception as e:
-            print(f"日経新聞ニュース取得エラー: {e}")
-        
-        try:
-            # 東洋経済オンライン
-            toyokeizai_url = "https://toyokeizai.net/"
-            response = requests.get(toyokeizai_url, headers=self.headers, timeout=5)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.content, 'html.parser')
-                news_items = soup.find_all(['h3', 'h4', 'a'], class_=re.compile(r'title|headline|news'))
-                for item in news_items[:3]:  # 最新3件
-                    title = item.get_text(strip=True)
-                    if title and len(title) > 10:
-                        news_data.append({
-                            'title': title,
-                            'source': '東洋経済',
-                            'timestamp': datetime.now()
-                        })
-        except Exception as e:
-            print(f"東洋経済ニュース取得エラー: {e}")
-        
-        # ニュースが取得できない場合はサンプルデータを使用
-        if not news_data:
-            news_data = sample_news
-        
-        return news_data
+        self.negative_words = {
+            '下落', '減少', '悪化', '損失', '弱気', '懸念', 'リスク', '問題', '売り', '警戒',
+            'down', 'fall', 'loss', 'negative', 'bearish', 'sell', 'risk', 'concern'
+        }
     
-    def analyze_market_sentiment(self, news_data: List[Dict]) -> Dict:
-        """市場センチメントを分析（詳細根拠付き）"""
-        positive_keywords = [
-            '上昇', '好調', '成長', '増益', '好決算', '買い', '推奨', '目標株価',
-            '上向き', '改善', '回復', '堅調', '活発', '拡大', '増加', 'プラス',
-            '好材料', '追い風', '期待', '楽観', '強気', 'ブレイクスルー', '躍進'
-        ]
-        
-        negative_keywords = [
-            '下落', '不調', '減益', '悪決算', '売り', '警戒', 'リスク', '懸念',
-            '下向き', '悪化', '減少', '縮小', 'マイナス', '調整', '不安', '危機',
-            '悪材料', '逆風', '悲観', '弱気', '減速', '悪化', '困難'
-        ]
-        
-        sector_keywords = {
-            'IT・通信': ['IT', 'AI', '人工知能', 'デジタル', 'ソフトウェア', '通信', '5G', 'クラウド'],
-            '金融': ['銀行', '証券', '保険', '金融', '金利', '為替', '投資'],
-            '製造業': ['自動車', '電機', '機械', '化学', '鉄鋼', '製造', '工場'],
-            'エネルギー': ['石油', 'ガス', '電力', 'エネルギー', '再生可能', '太陽光', '風力'],
-            'ヘルスケア': ['製薬', '医療', 'バイオ', 'ヘルスケア', '医薬品', '治療'],
-            '小売・サービス': ['小売', '流通', 'サービス', '飲食', '観光', 'エンタメ']
-        }
-        
-        positive_news = []
-        negative_news = []
-        neutral_news = []
-        sector_mentions = {}
-        sentiment_score = 0
-        
-        for news in news_data:
-            title = news['title']
-            title_lower = title.lower()
-            matched_positive = []
-            matched_negative = []
+    def analyze_market_news(self, symbols: List[str], days_back: int = 7) -> Dict:
+        """市場ニュースの分析"""
+        try:
+            results = {}
             
-            # ポジティブキーワードチェック
-            for keyword in positive_keywords:
-                if keyword in title_lower:
-                    matched_positive.append(keyword)
-                    sentiment_score += 1
+            for symbol in symbols:
+                # ニュースデータを取得
+                news_data = self._fetch_comprehensive_news(symbol, days_back)
+                
+                if news_data:
+                    # センチメント分析
+                    sentiment_analysis = self._analyze_sentiment(news_data)
+                    
+                    # キーワード分析
+                    keyword_analysis = self._analyze_keywords(news_data)
+                    
+                    # セクター分析
+                    sector_analysis = self._analyze_sector_impact(symbol, news_data)
+                    
+                    # 信頼度評価
+                    confidence = self._calculate_news_confidence(news_data)
+                    
+                    results[symbol] = {
+                        'sentiment': sentiment_analysis,
+                        'keywords': keyword_analysis,
+                        'sector_impact': sector_analysis,
+                        'confidence': confidence,
+                        'news_count': len(news_data),
+                        'sources': list(set([item['source'] for item in news_data]))
+                    }
             
-            # ネガティブキーワードチェック
-            for keyword in negative_keywords:
-                if keyword in title_lower:
-                    matched_negative.append(keyword)
-                    sentiment_score -= 1
+            return results
             
-            # セクター分析
-            for sector, keywords in sector_keywords.items():
-                for keyword in keywords:
-                    if keyword in title:
-                        sector_mentions[sector] = sector_mentions.get(sector, 0) + 1
+        except Exception as e:
+            print(f"市場ニュース分析エラー: {e}")
+            return {}
+    
+    def get_sector_news(self, sector: str, days_back: int = 7) -> Dict:
+        """セクター別ニュース取得"""
+        try:
+            # セクターキーワードマッピング
+            sector_keywords = {
+                'technology': ['テクノロジー', 'IT', 'ソフトウェア', 'ハードウェア', 'AI', '人工知能', 'technology', 'software'],
+                'finance': ['金融', '銀行', '保険', '証券', '投資', 'finance', 'banking', 'investment'],
+                'healthcare': ['医療', '製薬', 'バイオ', 'ヘルスケア', 'healthcare', 'pharmaceutical', 'medical'],
+                'automotive': ['自動車', '車', 'トヨタ', 'ホンダ', '日産', 'automotive', 'car', 'vehicle'],
+                'energy': ['エネルギー', '石油', 'ガス', '電力', '再生可能', 'energy', 'oil', 'gas', 'power']
+            }
             
-            # ニュース分類
-            if matched_positive and not matched_negative:
-                positive_news.append({
-                    'title': title,
-                    'source': news['source'],
-                    'keywords': matched_positive
-                })
-            elif matched_negative and not matched_positive:
-                negative_news.append({
-                    'title': title,
-                    'source': news['source'],
-                    'keywords': matched_negative
-                })
+            keywords = sector_keywords.get(sector.lower(), [sector])
+            news_data = self._fetch_sector_news(keywords, days_back)
+            
+            if news_data:
+                sentiment = self._analyze_sentiment(news_data)
+                keywords_analysis = self._analyze_keywords(news_data)
+                
+                return {
+                    'sector': sector,
+                    'sentiment': sentiment,
+                    'keywords': keywords_analysis,
+                    'news_count': len(news_data),
+                    'confidence': self._calculate_news_confidence(news_data)
+                }
+            
+            return {}
+            
+        except Exception as e:
+            print(f"セクターニュース取得エラー: {e}")
+            return {}
+    
+    def get_economic_indicators(self) -> Dict:
+        """経済指標の取得と分析"""
+        try:
+            indicators = {}
+            
+            # 日経平均関連ニュース
+            nikkei_news = self._fetch_nikkei_news()
+            if nikkei_news:
+                indicators['nikkei_sentiment'] = self._analyze_sentiment(nikkei_news)
+                indicators['nikkei_keywords'] = self._analyze_keywords(nikkei_news)
+            
+            # 為替関連ニュース
+            fx_news = self._fetch_fx_news()
+            if fx_news:
+                indicators['fx_sentiment'] = self._analyze_sentiment(fx_news)
+                indicators['fx_keywords'] = self._analyze_keywords(fx_news)
+            
+            # 金利関連ニュース
+            interest_news = self._fetch_interest_rate_news()
+            if interest_news:
+                indicators['interest_sentiment'] = self._analyze_sentiment(interest_news)
+                indicators['interest_keywords'] = self._analyze_keywords(interest_news)
+            
+            return indicators
+            
+        except Exception as e:
+            print(f"経済指標取得エラー: {e}")
+            return {}
+    
+    def _fetch_comprehensive_news(self, symbol: str, days_back: int) -> List[Dict]:
+        """包括的なニュース取得"""
+        try:
+            # キャッシュをチェック
+            cache_key = f"{symbol}_{days_back}"
+            if cache_key in self.cache:
+                cached_data, timestamp = self.cache[cache_key]
+                if time.time() - timestamp < self.cache_duration:
+                    return cached_data
+            
+            news_data = []
+            
+            # Yahoo Finance ニュース
+            yahoo_news = self._fetch_yahoo_news(symbol)
+            news_data.extend(yahoo_news)
+            
+            # Google ニュース
+            google_news = self._fetch_google_news(symbol)
+            news_data.extend(google_news)
+            
+            # 日本経済新聞
+            nikkei_news = self._fetch_nikkei_company_news(symbol)
+            news_data.extend(nikkei_news)
+            
+            # 重複を除去
+            unique_news = self._remove_duplicates(news_data)
+            
+            # キャッシュに保存
+            self.cache[cache_key] = (unique_news, time.time())
+            
+            return unique_news
+            
+        except Exception as e:
+            print(f"包括的ニュース取得エラー: {e}")
+            return []
+    
+    def _fetch_yahoo_news(self, symbol: str) -> List[Dict]:
+        """Yahoo Finance ニュース取得"""
+        try:
+            import yfinance as yf
+            
+            ticker = yf.Ticker(symbol)
+            news = ticker.news
+            
+            news_data = []
+            for article in news[:15]:  # 最新15件
+                if article.get('title') and article.get('summary'):
+                    news_data.append({
+                        'title': article['title'],
+                        'summary': article['summary'],
+                        'published': article.get('providerPublishTime', 0),
+                        'source': 'Yahoo Finance',
+                        'url': article.get('link', ''),
+                        'provider': article.get('provider', 'Yahoo')
+                    })
+            
+            return news_data
+            
+        except Exception as e:
+            print(f"Yahoo Finance ニュース取得エラー: {e}")
+            return []
+    
+    def _fetch_google_news(self, symbol: str) -> List[Dict]:
+        """Google ニュース取得"""
+        try:
+            # Google ニュース検索
+            query = f"{symbol} 株価 ニュース"
+            url = f"https://news.google.com/search?q={query}&hl=ja&gl=JP&ceid=JP:ja"
+            
+            response = self.session.get(url, timeout=10)
+            response.raise_for_status()
+            
+            soup = BeautifulSoup(response.content, 'html.parser')
+            articles = soup.find_all('article')[:10]  # 最新10件
+            
+            news_data = []
+            for article in articles:
+                title_elem = article.find('h3')
+                if title_elem:
+                    title = title_elem.get_text().strip()
+                    link_elem = title_elem.find('a')
+                    url = link_elem.get('href', '') if link_elem else ''
+                    
+                    news_data.append({
+                        'title': title,
+                        'summary': '',
+                        'published': int(time.time()),
+                        'source': 'Google News',
+                        'url': url,
+                        'provider': 'Google'
+                    })
+            
+            return news_data
+            
+        except Exception as e:
+            print(f"Google ニュース取得エラー: {e}")
+            return []
+    
+    def _fetch_nikkei_company_news(self, symbol: str) -> List[Dict]:
+        """日本経済新聞 企業ニュース取得"""
+        try:
+            # 企業名を取得（簡易版）
+            company_name = self._get_company_name(symbol)
+            if not company_name:
+                return []
+            
+            # Nikkei 検索
+            query = f"{company_name} 株価"
+            url = f"https://www.nikkei.com/search?keyword={query}"
+            
+            response = self.session.get(url, timeout=10)
+            response.raise_for_status()
+            
+            soup = BeautifulSoup(response.content, 'html.parser')
+            articles = soup.find_all('a', class_='m-miM09_title')[:5]  # 最新5件
+            
+            news_data = []
+            for article in articles:
+                title = article.get_text().strip()
+                url = article.get('href', '')
+                
+                if title and url:
+                    news_data.append({
+                        'title': title,
+                        'summary': '',
+                        'published': int(time.time()),
+                        'source': '日本経済新聞',
+                        'url': urljoin('https://www.nikkei.com', url),
+                        'provider': 'Nikkei'
+                    })
+            
+            return news_data
+            
+        except Exception as e:
+            print(f"日本経済新聞取得エラー: {e}")
+            return []
+    
+    def _fetch_sector_news(self, keywords: List[str], days_back: int) -> List[Dict]:
+        """セクター別ニュース取得"""
+        try:
+            news_data = []
+            
+            for keyword in keywords[:3]:  # 上位3キーワード
+                # Google ニュース検索
+                query = f"{keyword} 株価 ニュース"
+                url = f"https://news.google.com/search?q={query}&hl=ja&gl=JP&ceid=JP:ja"
+                
+                response = self.session.get(url, timeout=10)
+                response.raise_for_status()
+                
+                soup = BeautifulSoup(response.content, 'html.parser')
+                articles = soup.find_all('article')[:5]  # 各キーワード5件
+                
+                for article in articles:
+                    title_elem = article.find('h3')
+                    if title_elem:
+                        title = title_elem.get_text().strip()
+                        link_elem = title_elem.find('a')
+                        url = link_elem.get('href', '') if link_elem else ''
+                        
+                        news_data.append({
+                            'title': title,
+                            'summary': '',
+                            'published': int(time.time()),
+                            'source': 'Google News',
+                            'url': url,
+                            'provider': 'Google',
+                            'keyword': keyword
+                        })
+            
+            return news_data
+            
+        except Exception as e:
+            print(f"セクターニュース取得エラー: {e}")
+            return []
+    
+    def _fetch_nikkei_news(self) -> List[Dict]:
+        """日経平均関連ニュース取得"""
+        try:
+            url = "https://www.nikkei.com/markets/kabu/"
+            response = self.session.get(url, timeout=10)
+            response.raise_for_status()
+            
+            soup = BeautifulSoup(response.content, 'html.parser')
+            articles = soup.find_all('a', class_='m-miM09_title')[:10]
+            
+            news_data = []
+            for article in articles:
+                title = article.get_text().strip()
+                url = article.get('href', '')
+                
+                if title and url:
+                    news_data.append({
+                        'title': title,
+                        'summary': '',
+                        'published': int(time.time()),
+                        'source': '日本経済新聞',
+                        'url': urljoin('https://www.nikkei.com', url),
+                        'provider': 'Nikkei'
+                    })
+            
+            return news_data
+            
+        except Exception as e:
+            print(f"日経ニュース取得エラー: {e}")
+            return []
+    
+    def _fetch_fx_news(self) -> List[Dict]:
+        """為替関連ニュース取得"""
+        try:
+            url = "https://www.nikkei.com/markets/forex/"
+            response = self.session.get(url, timeout=10)
+            response.raise_for_status()
+            
+            soup = BeautifulSoup(response.content, 'html.parser')
+            articles = soup.find_all('a', class_='m-miM09_title')[:10]
+            
+            news_data = []
+            for article in articles:
+                title = article.get_text().strip()
+                url = article.get('href', '')
+                
+                if title and url:
+                    news_data.append({
+                        'title': title,
+                        'summary': '',
+                        'published': int(time.time()),
+                        'source': '日本経済新聞',
+                        'url': urljoin('https://www.nikkei.com', url),
+                        'provider': 'Nikkei'
+                    })
+            
+            return news_data
+            
+        except Exception as e:
+            print(f"為替ニュース取得エラー: {e}")
+            return []
+    
+    def _fetch_interest_rate_news(self) -> List[Dict]:
+        """金利関連ニュース取得"""
+        try:
+            query = "金利 日銀 政策金利"
+            url = f"https://news.google.com/search?q={query}&hl=ja&gl=JP&ceid=JP:ja"
+            
+            response = self.session.get(url, timeout=10)
+            response.raise_for_status()
+            
+            soup = BeautifulSoup(response.content, 'html.parser')
+            articles = soup.find_all('article')[:10]
+            
+            news_data = []
+            for article in articles:
+                title_elem = article.find('h3')
+                if title_elem:
+                    title = title_elem.get_text().strip()
+                    link_elem = title_elem.find('a')
+                    url = link_elem.get('href', '') if link_elem else ''
+                    
+                    news_data.append({
+                        'title': title,
+                        'summary': '',
+                        'published': int(time.time()),
+                        'source': 'Google News',
+                        'url': url,
+                        'provider': 'Google'
+                    })
+            
+            return news_data
+            
+        except Exception as e:
+            print(f"金利ニュース取得エラー: {e}")
+            return []
+    
+    def _analyze_sentiment(self, news_data: List[Dict]) -> Dict:
+        """センチメント分析"""
+        try:
+            if not news_data:
+                return {'score': 0.0, 'sentiment': 'neutral', 'confidence': 0.0}
+            
+            total_score = 0
+            analyzed_count = 0
+            
+            for item in news_data:
+                text = (item['title'] + ' ' + item['summary']).lower()
+                
+                positive_count = sum(1 for word in self.positive_words if word in text)
+                negative_count = sum(1 for word in self.negative_words if word in text)
+                
+                if positive_count + negative_count > 0:
+                    score = (positive_count - negative_count) / (positive_count + negative_count)
+                    total_score += score
+                    analyzed_count += 1
+            
+            if analyzed_count == 0:
+                return {'score': 0.0, 'sentiment': 'neutral', 'confidence': 0.0}
+            
+            avg_score = total_score / analyzed_count
+            
+            # センチメント判定
+            if avg_score > 0.2:
+                sentiment = 'positive'
+            elif avg_score < -0.2:
+                sentiment = 'negative'
             else:
-                neutral_news.append({
-                    'title': title,
-                    'source': news['source'],
-                    'keywords': matched_positive + matched_negative
-                })
-        
-        # センチメント判定
-        if sentiment_score > 0:
-            overall_sentiment = 'positive'
-        elif sentiment_score < 0:
-            overall_sentiment = 'negative'
-        else:
-            overall_sentiment = 'neutral'
-        
-        # 信頼度計算
-        total_news = len(news_data)
-        confidence_level = min(abs(sentiment_score) / max(total_news, 1) * 100, 100)
-        
-        return {
-            'sentiment_score': sentiment_score,
-            'sector_mentions': sector_mentions,
-            'overall_sentiment': overall_sentiment,
-            'confidence_level': confidence_level,
-            'positive_news': positive_news[:5],  # 上位5件
-            'negative_news': negative_news[:5],  # 上位5件
-            'neutral_news': neutral_news[:3],    # 上位3件
-            'analysis_details': {
-                'positive_keywords_found': list(set([kw for news in positive_news for kw in news['keywords']])),
-                'negative_keywords_found': list(set([kw for news in negative_news for kw in news['keywords']])),
-                'total_news_analyzed': total_news,
-                'positive_count': len(positive_news),
-                'negative_count': len(negative_news),
-                'neutral_count': len(neutral_news)
-            }
-        }
-    
-    def get_market_conditions(self) -> Dict:
-        """現在の市場状況を分析"""
-        conditions = {
-            'volatility': 'normal',  # low, normal, high
-            'trend': 'sideways',     # bullish, bearish, sideways
-            'sector_rotation': 'none',  # tech, value, growth, none
-            'risk_level': 'medium'   # low, medium, high
-        }
-        
-        # 実際の実装では、より詳細な市場データ分析を行う
-        # ここでは簡易的な例を示す
-        
-        return conditions
-    
-    def suggest_screening_criteria(self, sentiment_data: Dict, market_conditions: Dict) -> Dict:
-        """市場状況に基づいてスクリーニング条件を提案"""
-        
-        # 基本条件
-        base_criteria = {
-            'pe_min': 5.0,
-            'pe_max': 20.0,
-            'pb_min': 0.5,
-            'pb_max': 2.0,
-            'roe_min': 10.0,
-            'dividend_min': 2.0,
-            'debt_max': 50.0
-        }
-        
-        # センチメントに基づく調整
-        if sentiment_data['overall_sentiment'] == 'positive':
-            # 好材料が多い場合は、やや積極的な条件
-            base_criteria['pe_max'] = 25.0
-            base_criteria['pb_max'] = 2.5
-            base_criteria['roe_min'] = 8.0
-        elif sentiment_data['overall_sentiment'] == 'negative':
-            # 悪材料が多い場合は、より保守的な条件
-            base_criteria['pe_max'] = 15.0
-            base_criteria['pb_max'] = 1.5
-            base_criteria['roe_min'] = 12.0
-            base_criteria['dividend_min'] = 2.5
-        
-        # 市場状況に基づく調整
-        if market_conditions['volatility'] == 'high':
-            # 高ボラティリティの場合は、より厳格な条件
-            base_criteria['debt_max'] = 40.0
-            base_criteria['dividend_min'] = 2.5
-        elif market_conditions['volatility'] == 'low':
-            # 低ボラティリティの場合は、やや緩い条件
-            base_criteria['pe_max'] = 22.0
-            base_criteria['pb_max'] = 2.2
-        
-        # セクター別の推奨
-        recommended_sectors = []
-        if sentiment_data['sector_mentions']:
-            sorted_sectors = sorted(sentiment_data['sector_mentions'].items(), 
-                                  key=lambda x: x[1], reverse=True)
-            recommended_sectors = [sector for sector, count in sorted_sectors[:3]]
-        
-        return {
-            'criteria': base_criteria,
-            'recommended_sectors': recommended_sectors,
-            'reasoning': self._generate_reasoning(sentiment_data, market_conditions),
-            'investment_strategy': self._suggest_strategy(sentiment_data, market_conditions)
-        }
-    
-    def _generate_reasoning(self, sentiment_data: Dict, market_conditions: Dict) -> str:
-        """推奨理由を生成"""
-        reasoning_parts = []
-        
-        if sentiment_data['overall_sentiment'] == 'positive':
-            reasoning_parts.append("市場センチメントが良好なため、やや積極的な投資条件を推奨")
-        elif sentiment_data['overall_sentiment'] == 'negative':
-            reasoning_parts.append("市場センチメントが慎重なため、保守的な投資条件を推奨")
-        
-        if market_conditions['volatility'] == 'high':
-            reasoning_parts.append("市場のボラティリティが高いため、財務健全性を重視")
-        
-        if sentiment_data['sector_mentions']:
-            top_sector = max(sentiment_data['sector_mentions'].items(), key=lambda x: x[1])
-            reasoning_parts.append(f"{top_sector[0]}セクターが注目されているため、関連銘柄を検討")
-        
-        return "。".join(reasoning_parts) + "。"
-    
-    def _suggest_strategy(self, sentiment_data: Dict, market_conditions: Dict) -> str:
-        """投資戦略を提案"""
-        if sentiment_data['overall_sentiment'] == 'positive' and market_conditions['volatility'] == 'low':
-            return "グロース投資戦略"
-        elif sentiment_data['overall_sentiment'] == 'negative' or market_conditions['volatility'] == 'high':
-            return "バリュー投資戦略"
-        else:
-            return "バランス型投資戦略"
-    
-    def get_current_recommendations(self) -> Dict:
-        """現在の推奨条件を取得"""
-        try:
-            # ニュース取得
-            news_data = self.get_financial_news()
+                sentiment = 'neutral'
             
-            # センチメント分析
-            sentiment_data = self.analyze_market_sentiment(news_data)
-            
-            # 市場状況分析
-            market_conditions = self.get_market_conditions()
-            
-            # 推奨条件生成
-            recommendations = self.suggest_screening_criteria(sentiment_data, market_conditions)
+            # 信頼度計算
+            confidence = min(analyzed_count / 10, 1.0)  # 10件で最大信頼度
             
             return {
-                'news_data': news_data,
-                'sentiment_data': sentiment_data,
-                'market_conditions': market_conditions,
-                'recommendations': recommendations,
-                'timestamp': datetime.now()
+                'score': avg_score,
+                'sentiment': sentiment,
+                'confidence': confidence,
+                'analyzed_count': analyzed_count
             }
             
         except Exception as e:
-            print(f"推奨条件生成エラー: {e}")
-            # エラー時はデフォルト条件を返す
-            return {
-                'news_data': [],
-                'sentiment_data': {'overall_sentiment': 'neutral', 'sector_mentions': {}},
-                'market_conditions': {'volatility': 'normal', 'trend': 'sideways'},
-                'recommendations': {
-                    'criteria': {
-                        'pe_min': 5.0, 'pe_max': 20.0, 'pb_min': 0.5, 'pb_max': 2.0,
-                        'roe_min': 10.0, 'dividend_min': 2.0, 'debt_max': 50.0
-                    },
-                    'recommended_sectors': [],
-                    'reasoning': 'デフォルトのバランス型投資条件を推奨',
-                    'investment_strategy': 'バランス型投資戦略'
-                },
-                'timestamp': datetime.now()
+            print(f"センチメント分析エラー: {e}")
+            return {'score': 0.0, 'sentiment': 'neutral', 'confidence': 0.0}
+    
+    def _analyze_keywords(self, news_data: List[Dict]) -> Dict:
+        """キーワード分析"""
+        try:
+            if not news_data:
+                return {'keywords': [], 'frequency': {}}
+            
+            # テキストを結合
+            texts = [item['title'] + ' ' + item['summary'] for item in news_data]
+            combined_text = ' '.join(texts)
+            
+            # キーワード抽出
+            words = re.findall(r'\b\w+\b', combined_text.lower())
+            
+            # ストップワードを除外
+            stop_words = {
+                'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
+                'is', 'are', 'was', 'were', 'be', 'been', 'have', 'has', 'had', 'do', 'does', 'did',
+                'will', 'would', 'could', 'should', 'may', 'might', 'can', 'this', 'that', 'these', 'those',
+                'a', 'an', 'の', 'に', 'を', 'は', 'が', 'で', 'と', 'も', 'から', 'まで'
             }
+            
+            filtered_words = [word for word in words if word not in stop_words and len(word) > 2]
+            
+            # 頻度計算
+            word_freq = pd.Series(filtered_words).value_counts()
+            top_keywords = word_freq.head(10)
+            
+            return {
+                'keywords': top_keywords.index.tolist(),
+                'frequency': top_keywords.to_dict()
+            }
+            
+        except Exception as e:
+            print(f"キーワード分析エラー: {e}")
+            return {'keywords': [], 'frequency': {}}
+    
+    def _analyze_sector_impact(self, symbol: str, news_data: List[Dict]) -> Dict:
+        """セクター影響分析"""
+        try:
+            # セクターキーワード
+            sector_keywords = {
+                'technology': ['テクノロジー', 'IT', 'ソフトウェア', 'ハードウェア', 'AI', '人工知能', 'technology', 'software'],
+                'finance': ['金融', '銀行', '保険', '証券', '投資', 'finance', 'banking', 'investment'],
+                'healthcare': ['医療', '製薬', 'バイオ', 'ヘルスケア', 'healthcare', 'pharmaceutical', 'medical'],
+                'automotive': ['自動車', '車', 'トヨタ', 'ホンダ', '日産', 'automotive', 'car', 'vehicle'],
+                'energy': ['エネルギー', '石油', 'ガス', '電力', '再生可能', 'energy', 'oil', 'gas', 'power'],
+                'retail': ['小売', '流通', 'EC', 'オンライン', 'retail', 'commerce', 'online'],
+                'manufacturing': ['製造', '工場', '生産', 'manufacturing', 'production', 'factory']
+            }
+            
+            sector_mentions = {}
+            
+            for sector, keywords in sector_keywords.items():
+                mentions = 0
+                for item in news_data:
+                    text = (item['title'] + ' ' + item['summary']).lower()
+                    mentions += sum(1 for keyword in keywords if keyword in text)
+                
+                sector_mentions[sector] = mentions
+            
+            # 最も言及されたセクター
+            top_sector = max(sector_mentions.items(), key=lambda x: x[1])[0] if sector_mentions else None
+            
+            return {
+                'sector_mentions': sector_mentions,
+                'top_sector': top_sector,
+                'total_mentions': sum(sector_mentions.values())
+            }
+            
+        except Exception as e:
+            print(f"セクター影響分析エラー: {e}")
+            return {}
+    
+    def _calculate_news_confidence(self, news_data: List[Dict]) -> float:
+        """ニュース信頼度計算"""
+        try:
+            if not news_data:
+                return 0.0
+            
+            confidence = 0.0
+            
+            # ニュース数に基づく信頼度
+            news_count = len(news_data)
+            confidence += min(news_count / 20, 0.4)  # 20件で最大0.4
+            
+            # ソースの多様性
+            sources = set([item['source'] for item in news_data])
+            confidence += min(len(sources) / 5, 0.3)  # 5ソースで最大0.3
+            
+            # プロバイダーの信頼性
+            trusted_providers = {'Yahoo Finance', '日本経済新聞', 'Nikkei', 'Google News'}
+            trusted_count = sum(1 for item in news_data if item.get('provider', '') in trusted_providers)
+            confidence += min(trusted_count / len(news_data), 0.3)  # 信頼できるプロバイダーで最大0.3
+            
+            return min(confidence, 1.0)
+            
+        except Exception as e:
+            print(f"ニュース信頼度計算エラー: {e}")
+            return 0.0
+    
+    def _remove_duplicates(self, news_data: List[Dict]) -> List[Dict]:
+        """重複ニュースの除去"""
+        try:
+            seen_titles = set()
+            unique_news = []
+            
+            for item in news_data:
+                title = item['title'].strip()
+                if title not in seen_titles:
+                    seen_titles.add(title)
+                    unique_news.append(item)
+            
+            return unique_news
+            
+        except Exception as e:
+            print(f"重複除去エラー: {e}")
+            return news_data
+    
+    def _get_company_name(self, symbol: str) -> Optional[str]:
+        """銘柄コードから企業名を取得"""
+        try:
+            # 主要企業のマッピング
+            company_mapping = {
+                '7203.T': 'トヨタ自動車',
+                '6758.T': 'ソニー',
+                '9984.T': 'ソフトバンクグループ',
+                '9434.T': 'ソフトバンク',
+                '6861.T': 'キーエンス',
+                '4063.T': '信越化学工業',
+                '8306.T': '三菱UFJフィナンシャル・グループ',
+                '8316.T': '三井住友フィナンシャルグループ',
+                '8035.T': '東京エレクトロン',
+                '6954.T': 'ファナック'
+            }
+            
+            return company_mapping.get(symbol)
+            
+        except Exception as e:
+            print(f"企業名取得エラー: {e}")
+            return None

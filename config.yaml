@@ -1,0 +1,81 @@
+analysis:
+  confidence_threshold: 0.7
+  default_period: 1y
+  enable_ml_analysis: true
+  enable_news_analysis: true
+  enable_technical_analysis: true
+  max_stocks_per_analysis: 1000
+  min_data_points: 30
+api:
+  max_retries: 3
+  max_workers: 3
+  timeout: 30
+  user_agent: StockAnalysisTool/1.0
+  yahoo_finance_rate_limit: 0.2
+app_description: AI分析機能付き株価分析ツール
+app_name: 日本株価分析ツール
+app_version: 4.0.0
+cache:
+  analysis_results_ttl: 7200
+  cache_dir: cache
+  cleanup_interval_hours: 6
+  default_ttl: 3600
+  financial_metrics_ttl: 3600
+  max_memory_cache_size: 1000
+  stock_data_ttl: 1800
+database:
+  backup_enabled: true
+  backup_interval_hours: 24
+  cleanup_days: 30
+  db_path: stock_analysis.db
+
+# APIキー設定
+api_keys:
+  alpha_vantage: ""  # Alpha Vantage APIキー
+  iex_cloud: ""      # IEX Cloud APIキー
+  polygon: ""        # Polygon APIキー
+  quandl: ""         # Quandl APIキー
+
+# データソース設定
+data_sources:
+  yahoo_finance:
+    enabled: true
+    priority: 1
+    rate_limit: 1000
+  alpha_vantage:
+    enabled: false
+    priority: 2
+    rate_limit: 5
+  iex_cloud:
+    enabled: false
+    priority: 3
+    rate_limit: 100
+  polygon:
+    enabled: false
+    priority: 4
+    rate_limit: 200
+developer: yamaryu
+github_url: https://github.com/yamaryu999/stockAnalysis
+logging:
+  backup_count: 5
+  enable_console: true
+  enable_file: true
+  enable_json: false
+  log_dir: logs
+  log_level: INFO
+  max_file_size_mb: 10
+security:
+  allowed_origins:
+  - http://localhost:8501
+  - http://localhost:8504
+  enable_api_key_validation: false
+  enable_cors: true
+  max_requests_per_minute: 100
+ui:
+  auto_refresh: true
+  currency: JPY
+  enable_animations: true
+  language: ja
+  max_display_results: 100
+  refresh_interval_minutes: 5
+  theme: dark

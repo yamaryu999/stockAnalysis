@@ -1,0 +1,1098 @@
+/* 🎬 日本株価分析ツール v5.0 - Netflix風デザイン */
+
+/* ===== Netflix風CSS変数 ===== */
+:root {
+    /* Netflix公式カラーパレット */
+    --netflix-red: #e50914;
+    --netflix-red-dark: #b20710;
+    --netflix-red-light: #f40612;
+    --netflix-black: #141414;
+    --netflix-dark-gray: #181818;
+    --netflix-gray: #2f2f2f;
+    --netflix-light-gray: #564d4d;
+    --netflix-white: #ffffff;
+    --netflix-text-primary: #ffffff;
+    --netflix-text-secondary: #b3b3b3;
+    --netflix-text-muted: #737373;
+    
+    /* Netflix風グラデーション */
+    --netflix-gradient: linear-gradient(135deg, #e50914 0%, #b20710 100%);
+    --netflix-gradient-dark: linear-gradient(135deg, #b20710 0%, #8b0000 100%);
+    --netflix-bg-gradient: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 100%);
+    
+    /* Netflix風シャドウ */
+    --netflix-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --netflix-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+    --netflix-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+    --netflix-shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.6);
+    --netflix-glow: 0 0 20px rgba(229, 9, 20, 0.3);
+    
+    /* Netflix風ボーダー */
+    --netflix-border-radius: 4px;
+    --netflix-border-radius-lg: 8px;
+    --netflix-border-radius-xl: 12px;
+    
+    /* Netflix風スペーシング */
+    --netflix-spacing-xs: 0.25rem;
+    --netflix-spacing-sm: 0.5rem;
+    --netflix-spacing-md: 1rem;
+    --netflix-spacing-lg: 1.5rem;
+    --netflix-spacing-xl: 2rem;
+    --netflix-spacing-xxl: 3rem;
+    
+    /* Netflix風トランジション */
+    --netflix-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --netflix-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --netflix-transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Netflix風フォント */
+    --netflix-font-family: 'Netflix Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --netflix-font-weight-light: 300;
+    --netflix-font-weight-normal: 400;
+    --netflix-font-weight-medium: 500;
+    --netflix-font-weight-bold: 700;
+    --netflix-font-weight-black: 900;
+}
+
+/* ===== グローバルスタイル ===== */
+* {
+    box-sizing: border-box;
+}
+
+.main { 
+    padding: 0 !important; 
+}
+
+.stApp { 
+    background: var(--netflix-black);
+    color: var(--netflix-text-primary);
+    min-height: 100vh;
+    font-family: var(--netflix-font-family);
+    font-weight: var(--netflix-font-weight-normal);
+    line-height: 1.4;
+}
+
+/* ===== Netflix風スクロールバー ===== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--netflix-dark-gray);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--netflix-red);
+    border-radius: 4px;
+    transition: var(--netflix-transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--netflix-red-light);
+}
+
+/* ===== Netflix風ヘッダー ===== */
+.main-header { 
+    background: var(--netflix-bg-gradient);
+    backdrop-filter: blur(10px);
+    border: none;
+    padding: var(--netflix-spacing-xxl);
+    border-radius: 0;
+    margin-bottom: var(--netflix-spacing-xl);
+    text-align: center;
+    color: var(--netflix-text-primary);
+    box-shadow: var(--netflix-shadow-lg);
+    position: relative;
+    overflow: hidden;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--netflix-gradient);
+    opacity: 0.1;
+    z-index: -1;
+}
+
+.main-header h1 { 
+    margin: 0;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: var(--netflix-font-weight-black);
+    color: var(--netflix-text-primary);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: var(--netflix-spacing-sm);
+}
+
+.main-header p { 
+    margin: 0;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    color: var(--netflix-text-secondary);
+    font-weight: var(--netflix-font-weight-normal);
+    letter-spacing: 0.01em;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.main-header .netflix-badge {
+    display: inline-block;
+    background: var(--netflix-red);
+    color: var(--netflix-white);
+    padding: var(--netflix-spacing-xs) var(--netflix-spacing-sm);
+    border-radius: var(--netflix-border-radius);
+    font-size: 0.8rem;
+    font-weight: var(--netflix-font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: var(--netflix-spacing-md);
+    box-shadow: var(--netflix-shadow-sm);
+}
+
+/* ===== Netflix風サイドバー ===== */
+.css-1d391kg { 
+    background: var(--netflix-dark-gray);
+    border-right: 1px solid var(--netflix-gray);
+    padding: var(--netflix-spacing-md);
+}
+
+.sidebar-header { 
+    background: var(--netflix-gradient);
+    padding: var(--netflix-spacing-lg);
+    border-radius: var(--netflix-border-radius-lg);
+    margin-bottom: var(--netflix-spacing-lg);
+    text-align: center;
+    color: var(--netflix-white);
+    border: none;
+    box-shadow: var(--netflix-shadow-md);
+    transition: var(--netflix-transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.sidebar-header:hover::before {
+    left: 100%;
+}
+
+.sidebar-header:hover {
+    background: var(--netflix-gradient-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--netflix-shadow-lg);
+}
+
+.sidebar-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: var(--netflix-font-weight-bold);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.sidebar-header p {
+    margin: var(--netflix-spacing-xs) 0 0 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== Netflix風ナビゲーションメニュー ===== */
+.netflix-nav-menu {
+    background: var(--netflix-dark-gray);
+    border-radius: var(--netflix-border-radius-lg);
+    padding: var(--netflix-spacing-md);
+    margin-bottom: var(--netflix-spacing-lg);
+    border: 1px solid var(--netflix-gray);
+    box-shadow: var(--netflix-shadow-sm);
+}
+
+.netflix-nav-item {
+    display: flex;
+    align-items: center;
+    padding: var(--netflix-spacing-sm) var(--netflix-spacing-md);
+    margin: var(--netflix-spacing-xs) 0;
+    border-radius: var(--netflix-border-radius);
+    color: var(--netflix-text-secondary);
+    text-decoration: none;
+    transition: all var(--netflix-transition);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.netflix-nav-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--netflix-gradient);
+    transform: scaleY(0);
+    transition: transform var(--netflix-transition);
+}
+
+.netflix-nav-item:hover {
+    background: var(--netflix-gray);
+    color: var(--netflix-text-primary);
+    transform: translateX(4px);
+}
+
+.netflix-nav-item:hover::before {
+    transform: scaleY(1);
+}
+
+.netflix-nav-item.active {
+    background: var(--netflix-gradient);
+    color: var(--netflix-white);
+    box-shadow: var(--netflix-shadow-md);
+}
+
+.netflix-nav-item.active::before {
+    transform: scaleY(1);
+}
+
+.netflix-nav-icon {
+    font-size: 1.2rem;
+    margin-right: var(--netflix-spacing-sm);
+    width: 20px;
+    text-align: center;
+}
+
+.netflix-nav-text {
+    font-weight: var(--netflix-font-weight-medium);
+    font-size: 0.95rem;
+}
+
+/* ===== Netflix風クイックアクセス ===== */
+.netflix-quick-access {
+    background: var(--netflix-dark-gray);
+    border-radius: var(--netflix-border-radius-lg);
+    padding: var(--netflix-spacing-md);
+    margin-bottom: var(--netflix-spacing-lg);
+    border: 1px solid var(--netflix-gray);
+    box-shadow: var(--netflix-shadow-sm);
+}
+
+.netflix-quick-access h3 {
+    color: var(--netflix-text-primary);
+    font-size: 1rem;
+    font-weight: var(--netflix-font-weight-bold);
+    margin-bottom: var(--netflix-spacing-md);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.netflix-quick-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--netflix-spacing-sm);
+}
+
+.netflix-quick-btn {
+    background: var(--netflix-gradient);
+    border: none;
+    border-radius: var(--netflix-border-radius);
+    color: var(--netflix-white);
+    padding: var(--netflix-spacing-sm);
+    font-size: 0.85rem;
+    font-weight: var(--netflix-font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all var(--netflix-transition);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.netflix-quick-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.netflix-quick-btn:hover::before {
+    left: 100%;
+}
+
+.netflix-quick-btn:hover {
+    background: var(--netflix-gradient-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--netflix-shadow-md);
+}
+
+/* ===== Netflix風設定セクション ===== */
+.netflix-settings {
+    background: var(--netflix-dark-gray);
+    border-radius: var(--netflix-border-radius-lg);
+    padding: var(--netflix-spacing-md);
+    margin-bottom: var(--netflix-spacing-lg);
+    border: 1px solid var(--netflix-gray);
+    box-shadow: var(--netflix-shadow-sm);
+}
+
+.netflix-settings h3 {
+    color: var(--netflix-text-primary);
+    font-size: 1rem;
+    font-weight: var(--netflix-font-weight-bold);
+    margin-bottom: var(--netflix-spacing-md);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.netflix-setting-item {
+    margin-bottom: var(--netflix-spacing-md);
+}
+
+.netflix-setting-label {
+    color: var(--netflix-text-secondary);
+    font-size: 0.9rem;
+    font-weight: var(--netflix-font-weight-medium);
+    margin-bottom: var(--netflix-spacing-xs);
+    display: block;
+}
+
+.netflix-setting-control {
+    width: 100%;
+    background: var(--netflix-gray);
+    border: 1px solid var(--netflix-light-gray);
+    border-radius: var(--netflix-border-radius);
+    color: var(--netflix-text-primary);
+    padding: var(--netflix-spacing-sm);
+    font-size: 0.9rem;
+    transition: var(--netflix-transition);
+}
+
+.netflix-setting-control:focus {
+    border-color: var(--netflix-red);
+    box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.2);
+    outline: none;
+}
+
+.netflix-setting-control:hover {
+    border-color: var(--netflix-red);
+}
+
+/* ===== Netflix風カード ===== */
+.metric-card { 
+    background: var(--netflix-dark-gray);
+    border: 1px solid var(--netflix-gray);
+    padding: var(--netflix-spacing-lg);
+    border-radius: var(--netflix-border-radius-lg);
+    color: var(--netflix-text-primary);
+    text-align: center;
+    margin: var(--netflix-spacing-md) 0;
+    box-shadow: var(--netflix-shadow-md);
+    transition: all var(--netflix-transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--netflix-gradient);
+    transform: scaleX(0);
+    transition: transform var(--netflix-transition);
+}
+
+.metric-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--netflix-shadow-xl);
+    border-color: var(--netflix-red);
+}
+
+.metric-card:hover::before {
+    transform: scaleX(1);
+}
+
+.metric-card h3 {
+    margin: 0 0 var(--netflix-spacing-sm) 0;
+    font-size: 1rem;
+    font-weight: var(--netflix-font-weight-medium);
+    color: var(--netflix-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.metric-card .metric-value {
+    font-size: 2.5rem;
+    font-weight: var(--netflix-font-weight-black);
+    color: var(--netflix-red);
+    margin: 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.metric-card .metric-label {
+    margin: var(--netflix-spacing-xs) 0 0 0;
+    font-size: 0.9rem;
+    color: var(--netflix-text-muted);
+    font-weight: var(--netflix-font-weight-normal);
+}
+
+/* ===== Netflix風ステータスカード ===== */
+.success-card { 
+    background: var(--netflix-dark-gray);
+    border: 1px solid #4caf50;
+    padding: var(--netflix-spacing-lg);
+    border-radius: var(--netflix-border-radius-lg);
+    color: var(--netflix-text-primary);
+    text-align: center;
+    margin: var(--netflix-spacing-md) 0;
+    box-shadow: var(--netflix-shadow-md), 0 0 20px rgba(76, 175, 80, 0.2);
+    transition: var(--netflix-transition);
+}
+
+.success-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--netflix-shadow-xl), 0 0 30px rgba(76, 175, 80, 0.3);
+}
+
+.warning-card { 
+    background: var(--netflix-dark-gray);
+    border: 1px solid #ff9800;
+    padding: var(--netflix-spacing-lg);
+    border-radius: var(--netflix-border-radius-lg);
+    color: var(--netflix-text-primary);
+    text-align: center;
+    margin: var(--netflix-spacing-md) 0;
+    box-shadow: var(--netflix-shadow-md), 0 0 20px rgba(255, 152, 0, 0.2);
+    transition: var(--netflix-transition);
+}
+
+.warning-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--netflix-shadow-xl), 0 0 30px rgba(255, 152, 0, 0.3);
+}
+
+.error-card { 
+    background: var(--netflix-dark-gray);
+    border: 1px solid var(--netflix-red);
+    padding: var(--netflix-spacing-lg);
+    border-radius: var(--netflix-border-radius-lg);
+    color: var(--netflix-text-primary);
+    text-align: center;
+    margin: var(--netflix-spacing-md) 0;
+    box-shadow: var(--netflix-shadow-md), var(--netflix-glow);
+    transition: var(--netflix-transition);
+}
+
+.error-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--netflix-shadow-xl), 0 0 40px rgba(229, 9, 20, 0.4);
+}
+
+/* ===== Netflix風タブ ===== */
+.stTabs [data-baseweb="tab-list"] { 
+    gap: var(--netflix-spacing-sm);
+    background: var(--netflix-dark-gray);
+    border-radius: var(--netflix-border-radius-lg);
+    padding: var(--netflix-spacing-sm);
+    border: 1px solid var(--netflix-gray);
+    box-shadow: var(--netflix-shadow-sm);
+}
+
+.stTabs [data-baseweb="tab"] { 
+    height: auto;
+    min-height: 44px;
+    white-space: pre-wrap;
+    background: transparent;
+    border-radius: var(--netflix-border-radius);
+    gap: var(--netflix-spacing-sm);
+    padding: var(--netflix-spacing-sm) var(--netflix-spacing-md);
+    border: none;
+    transition: all var(--netflix-transition);
+    font-weight: var(--netflix-font-weight-medium);
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    color: var(--netflix-text-secondary);
+    position: relative;
+    overflow: hidden;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    color: var(--netflix-text-primary);
+    background: var(--netflix-gray);
+}
+
+.stTabs [aria-selected="true"] { 
+    background: var(--netflix-gradient);
+    color: var(--netflix-white);
+    box-shadow: var(--netflix-shadow-md);
+    font-weight: var(--netflix-font-weight-bold);
+}
+
+/* ===== Netflix風ボタン ===== */
+.stButton > button { 
+    width: 100%;
+    border-radius: var(--netflix-border-radius);
+    border: none;
+    background: var(--netflix-gradient);
+    color: var(--netflix-white);
+    font-weight: var(--netflix-font-weight-bold);
+    padding: var(--netflix-spacing-sm) var(--netflix-spacing-lg);
+    transition: all var(--netflix-transition);
+    box-shadow: var(--netflix-shadow-md);
+    position: relative;
+    overflow: hidden;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    min-height: 44px;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+}
+
+.stButton > button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.stButton > button:hover {
+    background: var(--netflix-gradient-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--netflix-shadow-lg), var(--netflix-glow);
+}
+
+.stButton > button:hover::before {
+    left: 100%;
+}
+
+.stButton > button:active {
+    transform: translateY(0);
+}
+
+/* ===== Netflix風フォーム要素 ===== */
+.stSelectbox > div > div {
+    background: var(--netflix-dark-gray);
+    border: 1px solid var(--netflix-gray);
+    border-radius: var(--netflix-border-radius);
+    color: var(--netflix-text-primary);
+    transition: var(--netflix-transition);
+}
+
+.stSelectbox > div > div:hover {
+    border-color: var(--netflix-red);
+}
+
+.stNumberInput > div > div > input,
+.stTextInput > div > div > input {
+    background: var(--netflix-dark-gray);
+    border: 1px solid var(--netflix-gray);
+    border-radius: var(--netflix-border-radius);
+    color: var(--netflix-text-primary);
+    transition: var(--netflix-transition);
+}
+
+.stNumberInput > div > div > input:focus,
+.stTextInput > div > div > input:focus {
+    border-color: var(--netflix-red);
+    box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.2);
+}
+
+.stSlider > div > div {
+    background: var(--netflix-dark-gray);
+    border-radius: var(--netflix-border-radius);
+    padding: var(--netflix-spacing-sm);
+}
+
+.stSlider .stSlider > div > div > div {
+    background: var(--netflix-gradient);
+}
+
+/* ===== Netflix風Streamlit要素の隠しスタイル ===== */
+[data-testid="stSelectbox"] {
+    display: none !important;
+}
+
+[data-testid="stButton"] {
+    display: none !important;
+}
+
+[data-testid="stSlider"] {
+    display: none !important;
+}
+
+/* 隠し要素のラベルも非表示 */
+.stSelectbox label,
+.stButton label,
+.stSlider label {
+    display: none !important;
+}
+
+/* ===== Netflix風セクションタイトル ===== */
+.stMarkdown h1,
+.stMarkdown h2,
+.stMarkdown h3 {
+    color: var(--netflix-text-primary);
+    font-family: var(--netflix-font-family);
+    font-weight: var(--netflix-font-weight-bold);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.stMarkdown h1 {
+    font-size: 2rem;
+    margin-bottom: var(--netflix-spacing-lg);
+    border-bottom: 2px solid var(--netflix-red);
+    padding-bottom: var(--netflix-spacing-sm);
+}
+
+.stMarkdown h2 {
+    font-size: 1.5rem;
+    margin-bottom: var(--netflix-spacing-md);
+    color: var(--netflix-red);
+}
+
+.stMarkdown h3 {
+    font-size: 1.2rem;
+    margin-bottom: var(--netflix-spacing-sm);
+    color: var(--netflix-text-secondary);
+}
+
+/* ===== Netflix風セパレーター ===== */
+.stMarkdown hr {
+    border: none;
+    height: 1px;
+    background: var(--netflix-gradient);
+    margin: var(--netflix-spacing-xl) 0;
+    opacity: 0.5;
+}
+
+/* ===== Netflix風アラート ===== */
+.stAlert {
+    background: var(--netflix-dark-gray);
+    border: 1px solid var(--netflix-gray);
+    border-radius: var(--netflix-border-radius-lg);
+    color: var(--netflix-text-primary);
+    box-shadow: var(--netflix-shadow-md);
+}
+
+.stAlert[data-testid="stAlert"] {
+    border-left: 4px solid var(--netflix-red);
+}
+
+.stSuccess {
+    border-left-color: #4caf50 !important;
+}
+
+.stWarning {
+    border-left-color: #ff9800 !important;
+}
+
+.stError {
+    border-left-color: var(--netflix-red) !important;
+}
+
+.stInfo {
+    border-left-color: #2196f3 !important;
+}
+
+/* ===== Netflix風スピナー ===== */
+.stSpinner {
+    color: var(--netflix-red);
+}
+
+.stSpinner > div {
+    border-color: var(--netflix-red);
+}
+
+/* ===== Netflix風プログレスバー ===== */
+.stProgress > div > div {
+    background: var(--netflix-gradient);
+    border-radius: var(--netflix-border-radius);
+}
+
+.stProgress > div {
+    background: var(--netflix-gray);
+    border-radius: var(--netflix-border-radius);
+}
+
+/* ===== Netflix風メトリクス ===== */
+.stMetric {
+    background: var(--netflix-dark-gray);
+    border: 1px solid var(--netflix-gray);
+    border-radius: var(--netflix-border-radius-lg);
+    padding: var(--netflix-spacing-md);
+    box-shadow: var(--netflix-shadow-sm);
+}
+
+.stMetric > div {
+    color: var(--netflix-text-primary);
+}
+
+.stMetric > div > div:first-child {
+    color: var(--netflix-text-secondary);
+    font-size: 0.9rem;
+    font-weight: var(--netflix-font-weight-medium);
+}
+
+.stMetric > div > div:last-child {
+    color: var(--netflix-red);
+    font-size: 1.5rem;
+    font-weight: var(--netflix-font-weight-bold);
+}
+
+/* ===== Netflix風データフレーム ===== */
+.stDataFrame {
+    background: var(--netflix-dark-gray);
+    border: 1px solid var(--netflix-gray);
+    border-radius: var(--netflix-border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--netflix-shadow-md);
+}
+
+/* ===== Netflix風プロット ===== */
+.plotly {
+    background: var(--netflix-dark-gray);
+    border: 1px solid var(--netflix-gray);
+    border-radius: var(--netflix-border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--netflix-shadow-md);
+}
+
+/* ===== Netflix風アクセシビリティ ===== */
+.stButton > button:focus {
+    outline: 3px solid var(--netflix-red);
+    outline-offset: 2px;
+}
+
+.metric-card:focus-within {
+    border-color: var(--netflix-red);
+    box-shadow: var(--netflix-shadow-lg), 0 0 0 2px rgba(229, 9, 20, 0.2);
+}
+
+.stTabs [data-baseweb="tab"]:focus {
+    outline: 2px solid var(--netflix-red);
+    outline-offset: 1px;
+}
+
+/* ===== Netflix風アニメーション ===== */
+@keyframes netflixFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes netflixSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes netflixPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes netflixGlow {
+    0%, 100% {
+        box-shadow: var(--netflix-shadow-md);
+    }
+    50% {
+        box-shadow: var(--netflix-shadow-lg), var(--netflix-glow);
+    }
+}
+
+/* アニメーション適用 */
+.metric-card {
+    animation: netflixFadeIn 0.6s ease-out;
+}
+
+.sidebar-header {
+    animation: netflixSlideIn 0.6s ease-out;
+}
+
+.main-header {
+    animation: netflixFadeIn 0.8s ease-out;
+}
+
+/* ===== Netflix風ローディング ===== */
+@keyframes netflixSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.netflix-loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--netflix-gray);
+    border-radius: 50%;
+    border-top-color: var(--netflix-red);
+    animation: netflixSpin 1s ease-in-out infinite;
+}
+
+/* ===== Netflix風ツールチップ ===== */
+.netflix-tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.netflix-tooltip .netflix-tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: var(--netflix-dark-gray);
+    color: var(--netflix-text-primary);
+    text-align: center;
+    border-radius: var(--netflix-border-radius);
+    padding: var(--netflix-spacing-sm);
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity var(--netflix-transition);
+    font-size: 0.875rem;
+    border: 1px solid var(--netflix-gray);
+    box-shadow: var(--netflix-shadow-md);
+}
+
+.netflix-tooltip:hover .netflix-tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* ===== レスポンシブブレークポイント ===== */
+
+/* モバイル (768px以下) */
+@media (max-width: 768px) {
+    .main-header {
+        padding: var(--netflix-spacing-lg);
+        margin-bottom: var(--netflix-spacing-lg);
+        min-height: 150px;
+    }
+    
+    .main-header h1 {
+        font-size: 2.5rem;
+    }
+    
+    .main-header p {
+        font-size: 1.2rem;
+    }
+    
+    .metric-card {
+        margin: var(--netflix-spacing-sm) 0;
+        padding: var(--netflix-spacing-md);
+    }
+    
+    .metric-card .metric-value {
+        font-size: 2rem;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 40px;
+        font-size: 0.85rem;
+        padding: var(--netflix-spacing-xs) var(--netflix-spacing-sm);
+    }
+    
+    .stButton > button {
+        padding: var(--netflix-spacing-sm) var(--netflix-spacing-md);
+        font-size: 0.9rem;
+        min-height: 40px;
+    }
+    
+    .sidebar-header {
+        padding: var(--netflix-spacing-md);
+        margin-bottom: var(--netflix-spacing-md);
+    }
+}
+
+/* タブレット (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .main-header {
+        padding: var(--netflix-spacing-xl);
+        min-height: 180px;
+    }
+    
+    .main-header h1 {
+        font-size: 3.5rem;
+    }
+    
+    .main-header p {
+        font-size: 1.5rem;
+    }
+    
+    .metric-card {
+        padding: var(--netflix-spacing-lg);
+    }
+    
+    .metric-card .metric-value {
+        font-size: 2.2rem;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 48px;
+        font-size: 0.95rem;
+    }
+}
+
+/* デスクトップ (1025px以上) */
+@media (min-width: 1025px) {
+    .main-header {
+        padding: var(--netflix-spacing-xxl);
+        min-height: 200px;
+    }
+    
+    .main-header h1 {
+        font-size: 5rem;
+    }
+    
+    .main-header p {
+        font-size: 1.8rem;
+    }
+    
+    .metric-card .metric-value {
+        font-size: 2.5rem;
+    }
+}
+
+/* ===== Netflix風ダークモード（デフォルト） ===== */
+@media (prefers-color-scheme: light) {
+    .stApp {
+        background: var(--netflix-black);
+        color: var(--netflix-text-primary);
+    }
+}
+
+/* ===== Netflix風印刷対応 ===== */
+@media print {
+    .main-header {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+        box-shadow: none !important;
+    }
+    
+    .metric-card {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+        box-shadow: none !important;
+    }
+    
+    .stButton > button {
+        background: black !important;
+        color: white !important;
+        border: 1px solid black !important;
+    }
+}
+
+/* ===== Netflix風カスタム要素 ===== */
+.netflix-hero {
+    background: linear-gradient(135deg, var(--netflix-black) 0%, var(--netflix-dark-gray) 100%);
+    padding: var(--netflix-spacing-xxl);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.netflix-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--netflix-gradient);
+    opacity: 0.1;
+    z-index: -1;
+}
+
+.netflix-section {
+    margin: var(--netflix-spacing-xl) 0;
+    padding: var(--netflix-spacing-lg);
+    background: var(--netflix-dark-gray);
+    border-radius: var(--netflix-border-radius-lg);
+    border: 1px solid var(--netflix-gray);
+    box-shadow: var(--netflix-shadow-md);
+}
+
+.netflix-section h2 {
+    color: var(--netflix-text-primary);
+    font-size: 1.5rem;
+    font-weight: var(--netflix-font-weight-bold);
+    margin-bottom: var(--netflix-spacing-lg);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.netflix-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--netflix-spacing-lg);
+    margin-top: var(--netflix-spacing-lg);
+}
+
+.netflix-card {
+    background: var(--netflix-dark-gray);
+    border: 1px solid var(--netflix-gray);
+    border-radius: var(--netflix-border-radius-lg);
+    padding: var(--netflix-spacing-lg);
+    transition: all var(--netflix-transition);
+    cursor: pointer;
+}
+
+.netflix-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--netflix-red);
+    box-shadow: var(--netflix-shadow-xl);
+}
+
+.netflix-card h3 {
+    color: var(--netflix-text-primary);
+    font-size: 1.1rem;
+    font-weight: var(--netflix-font-weight-bold);
+    margin-bottom: var(--netflix-spacing-sm);
+}
+
+.netflix-card p {
+    color: var(--netflix-text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}

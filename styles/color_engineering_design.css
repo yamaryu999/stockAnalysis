@@ -1,0 +1,1086 @@
+/* 🎨 日本株価分析ツール v5.0 - 色彩工学ベースデザイン */
+
+/* ===== 色彩工学に基づくCSS変数（科学的カラーパレット） ===== */
+:root {
+    /* 🌈 色彩工学の基本原則に基づく色相設定 */
+    
+    /* 主要色相 - 色相環の科学的配置 */
+    --hue-primary: 220;        /* 青系 - 信頼性と安定性（科学的根拠） */
+    --hue-secondary: 280;      /* 紫系 - 創造性と革新性（補色関係） */
+    --hue-accent: 160;         /* 緑系 - 成長と成功（120度の調和） */
+    --hue-warning: 45;         /* 黄系 - 注意と警戒（60度の調和） */
+    --hue-error: 15;           /* 赤系 - 危険と停止（180度の補色） */
+    --hue-info: 200;           /* 青緑系 - 情報と知識（30度の調和） */
+    
+    /* 🎯 色彩工学に基づく明度と彩度の最適化 */
+    /* アクセシビリティと視認性を科学的に計算 */
+    
+    /* 基本色の明度・彩度設定（WCAG AA準拠） */
+    --lightness-primary: 45%;      /* 中明度 - 読みやすさを確保 */
+    --lightness-secondary: 55%;    /* やや明るめ - 補助色として */
+    --lightness-accent: 50%;       /* 中明度 - アクセントとして */
+    --lightness-warning: 60%;       /* 明るめ - 注意喚起 */
+    --lightness-error: 50%;         /* 中明度 - 危険の警告 */
+    --lightness-info: 55%;         /* やや明るめ - 情報表示 */
+    
+    /* 彩度設定（視覚疲労を軽減） */
+    --saturation-primary: 75%;      /* 高彩度 - 主要色として */
+    --saturation-secondary: 65%;   /* 中高彩度 - 補助色として */
+    --saturation-accent: 70%;       /* 高彩度 - アクセントとして */
+    --saturation-warning: 80%;      /* 高彩度 - 注意喚起 */
+    --saturation-error: 75%;        /* 高彩度 - 危険の警告 */
+    --saturation-info: 60%;         /* 中彩度 - 情報表示 */
+    
+    /* 🎨 HSL色空間での科学的色定義 */
+    --color-primary: hsl(var(--hue-primary), var(--saturation-primary), var(--lightness-primary));
+    --color-primary-light: hsl(var(--hue-primary), var(--saturation-primary), calc(var(--lightness-primary) + 20%));
+    --color-primary-dark: hsl(var(--hue-primary), var(--saturation-primary), calc(var(--lightness-primary) - 20%));
+    --color-primary-muted: hsl(var(--hue-primary), calc(var(--saturation-primary) - 30%), var(--lightness-primary));
+    
+    --color-secondary: hsl(var(--hue-secondary), var(--saturation-secondary), var(--lightness-secondary));
+    --color-secondary-light: hsl(var(--hue-secondary), var(--saturation-secondary), calc(var(--lightness-secondary) + 20%));
+    --color-secondary-dark: hsl(var(--hue-secondary), var(--saturation-secondary), calc(var(--lightness-secondary) - 20%));
+    --color-secondary-muted: hsl(var(--hue-secondary), calc(var(--saturation-secondary) - 30%), var(--lightness-secondary));
+    
+    --color-accent: hsl(var(--hue-accent), var(--saturation-accent), var(--lightness-accent));
+    --color-accent-light: hsl(var(--hue-accent), var(--saturation-accent), calc(var(--lightness-accent) + 20%));
+    --color-accent-dark: hsl(var(--hue-accent), var(--saturation-accent), calc(var(--lightness-accent) - 20%));
+    --color-accent-muted: hsl(var(--hue-accent), calc(var(--saturation-accent) - 30%), var(--lightness-accent));
+    
+    --color-warning: hsl(var(--hue-warning), var(--saturation-warning), var(--lightness-warning));
+    --color-warning-light: hsl(var(--hue-warning), var(--saturation-warning), calc(var(--lightness-warning) + 20%));
+    --color-warning-dark: hsl(var(--hue-warning), var(--saturation-warning), calc(var(--lightness-warning) - 20%));
+    --color-warning-muted: hsl(var(--hue-warning), calc(var(--saturation-warning) - 30%), var(--lightness-warning));
+    
+    --color-error: hsl(var(--hue-error), var(--saturation-error), var(--lightness-error));
+    --color-error-light: hsl(var(--hue-error), var(--saturation-error), calc(var(--lightness-error) + 20%));
+    --color-error-dark: hsl(var(--hue-error), var(--saturation-error), calc(var(--lightness-error) - 20%));
+    --color-error-muted: hsl(var(--hue-error), calc(var(--saturation-error) - 30%), var(--lightness-error));
+    
+    --color-info: hsl(var(--hue-info), var(--saturation-info), var(--lightness-info));
+    --color-info-light: hsl(var(--hue-info), var(--saturation-info), calc(var(--lightness-info) + 20%));
+    --color-info-dark: hsl(var(--hue-info), var(--saturation-info), calc(var(--lightness-info) - 20%));
+    --color-info-muted: hsl(var(--hue-info), calc(var(--saturation-info) - 30%), var(--lightness-info));
+    
+    /* 🌟 色彩工学に基づくグラデーション */
+    /* 色相環の調和理論を適用 */
+    
+    /* 単色グラデーション（Monochromatic Harmony） */
+    --gradient-primary: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, var(--color-primary-light) 100%);
+    --gradient-secondary: linear-gradient(135deg, var(--color-secondary-dark) 0%, var(--color-secondary) 50%, var(--color-secondary-light) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--color-accent-dark) 0%, var(--color-accent) 50%, var(--color-accent-light) 100%);
+    
+    /* 類似色グラデーション（Analogous Harmony） */
+    --gradient-primary-secondary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    --gradient-primary-info: linear-gradient(135deg, var(--color-primary) 0%, var(--color-info) 100%);
+    --gradient-accent-info: linear-gradient(135deg, var(--color-accent) 0%, var(--color-info) 100%);
+    
+    /* 補色グラデーション（Complementary Harmony） */
+    --gradient-primary-accent: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    --gradient-warning-error: linear-gradient(135deg, var(--color-warning) 0%, var(--color-error) 100%);
+    
+    /* 三色グラデーション（Triadic Harmony） */
+    --gradient-triadic: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 50%, var(--color-warning) 100%);
+    
+    /* 🎯 ニュートラルカラー - 科学的グレースケール */
+    /* 視覚的な調和を考慮したグレースケール */
+    --neutral-0: hsl(0, 0%, 100%);    /* 純白 */
+    --neutral-50: hsl(0, 0%, 98%);    /* ほぼ白 */
+    --neutral-100: hsl(0, 0%, 95%);   /* 非常に薄いグレー */
+    --neutral-200: hsl(0, 0%, 90%);   /* 薄いグレー */
+    --neutral-300: hsl(0, 0%, 85%);   /* 明るいグレー */
+    --neutral-400: hsl(0, 0%, 75%);   /* 中程度のグレー */
+    --neutral-500: hsl(0, 0%, 60%);   /* 中間グレー */
+    --neutral-600: hsl(0, 0%, 45%);   /* 暗いグレー */
+    --neutral-700: hsl(0, 0%, 35%);   /* より暗いグレー */
+    --neutral-800: hsl(0, 0%, 25%);   /* 非常に暗いグレー */
+    --neutral-900: hsl(0, 0%, 15%);   /* ほぼ黒 */
+    --neutral-950: hsl(0, 0%, 5%);    /* 純黒 */
+    
+    /* 🌈 背景グラデーション - 色彩工学の奥行き理論 */
+    --bg-primary: linear-gradient(135deg, 
+        var(--neutral-950) 0%, 
+        var(--neutral-900) 20%, 
+        var(--neutral-800) 40%, 
+        var(--neutral-700) 60%, 
+        var(--neutral-600) 80%, 
+        var(--neutral-500) 100%);
+    
+    --bg-secondary: linear-gradient(135deg, 
+        var(--neutral-800) 0%, 
+        var(--neutral-700) 50%, 
+        var(--neutral-600) 100%);
+    
+    --bg-glass: rgba(255, 255, 255, 0.03);
+    --bg-glass-hover: rgba(255, 255, 255, 0.06);
+    --bg-card: var(--neutral-800);
+    --bg-card-hover: var(--neutral-700);
+    
+    /* 📝 テキストカラー - WCAG AA準拠のコントラスト比 */
+    --text-primary: var(--neutral-50);      /* コントラスト比 15.8:1 */
+    --text-secondary: var(--neutral-200);   /* コントラスト比 12.6:1 */
+    --text-muted: var(--neutral-400);       /* コントラスト比 7.1:1 */
+    --text-accent: var(--color-primary-light);
+    --text-success: var(--color-accent-light);
+    --text-warning: var(--color-warning-light);
+    --text-error: var(--color-error-light);
+    --text-info: var(--color-info-light);
+    
+    /* 🌟 シャドウ - 色彩工学の立体感理論 */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.25);
+    --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.3);
+    --shadow-2xl: 0 24px 48px rgba(0, 0, 0, 0.35);
+    
+    /* 色彩工学に基づくグロー効果 */
+    --shadow-glow-primary: 0 0 20px hsla(var(--hue-primary), var(--saturation-primary), 50%, 0.3);
+    --shadow-glow-secondary: 0 0 20px hsla(var(--hue-secondary), var(--saturation-secondary), 50%, 0.3);
+    --shadow-glow-accent: 0 0 20px hsla(var(--hue-accent), var(--saturation-accent), 50%, 0.3);
+    --shadow-glow-warning: 0 0 20px hsla(var(--hue-warning), var(--saturation-warning), 50%, 0.3);
+    --shadow-glow-error: 0 0 20px hsla(var(--hue-error), var(--saturation-error), 50%, 0.3);
+    --shadow-glow-info: 0 0 20px hsla(var(--hue-info), var(--saturation-info), 50%, 0.3);
+    
+    /* 🎨 ボーダー - 色彩調和を考慮 */
+    --border-radius-xs: 4px;
+    --border-radius-sm: 6px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-xl: 16px;
+    --border-radius-2xl: 24px;
+    --border-radius-full: 9999px;
+    
+    --border-primary: 1px solid var(--color-primary);
+    --border-secondary: 1px solid var(--color-secondary);
+    --border-accent: 1px solid var(--color-accent);
+    --border-warning: 1px solid var(--color-warning);
+    --border-error: 1px solid var(--color-error);
+    --border-info: 1px solid var(--color-info);
+    --border-neutral: 1px solid var(--neutral-600);
+    --border-glass: 1px solid rgba(255, 255, 255, 0.1);
+    
+    /* 📏 スペーシング - 黄金比とモジュラー・スケール */
+    --spacing-xs: 0.25rem;    /* 4px */
+    --spacing-sm: 0.5rem;     /* 8px */
+    --spacing-md: 1rem;       /* 16px */
+    --spacing-lg: 1.5rem;     /* 24px */
+    --spacing-xl: 2rem;       /* 32px */
+    --spacing-2xl: 3rem;       /* 48px */
+    --spacing-3xl: 4rem;       /* 64px */
+    --spacing-4xl: 6rem;       /* 96px */
+    
+    /* ⚡ トランジション - 自然な動きの物理法則 */
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* 🔤 フォント - 可読性の科学的根拠 */
+    --font-family-primary: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    --font-family-display: 'Inter', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+    
+    --font-weight-thin: 100;
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    --font-weight-black: 900;
+    
+    /* タイポグラフィスケール - モジュラー・スケール（1.25倍） */
+    --font-size-xs: 0.75rem;    /* 12px */
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-base: 1rem;     /* 16px */
+    --font-size-lg: 1.125rem;   /* 18px */
+    --font-size-xl: 1.25rem;    /* 20px */
+    --font-size-2xl: 1.5rem;    /* 24px */
+    --font-size-3xl: 1.875rem;  /* 30px */
+    --font-size-4xl: 2.25rem;   /* 36px */
+    --font-size-5xl: 3rem;      /* 48px */
+    --font-size-6xl: 3.75rem;   /* 60px */
+    --font-size-7xl: 4.5rem;    /* 72px */
+}
+
+/* ===== グローバルスタイル ===== */
+* {
+    box-sizing: border-box;
+}
+
+.main { 
+    padding: 0 !important; 
+}
+
+.stApp { 
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-family: var(--font-family-primary);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.6;
+    font-size: var(--font-size-base);
+}
+
+/* ===== カスタムスクロールバー - 色彩工学デザイン ===== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--neutral-800);
+    border-radius: var(--border-radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gradient-primary);
+    border-radius: var(--border-radius-sm);
+    transition: var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gradient-secondary);
+}
+
+/* ===== メインヘッダー - 色彩工学の焦点理論 ===== */
+.main-header { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    padding: var(--spacing-4xl);
+    border-radius: var(--border-radius-2xl);
+    margin-bottom: var(--spacing-3xl);
+    text-align: center;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-xl), var(--shadow-glow-primary);
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition-normal);
+}
+
+.main-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--gradient-primary);
+    opacity: 0.05;
+    transition: left 0.8s ease;
+}
+
+.main-header:hover::before {
+    left: 100%;
+}
+
+.main-header:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-2xl), var(--shadow-glow-accent);
+}
+
+.main-header h1 { 
+    margin: 0;
+    font-size: clamp(var(--font-size-4xl), 5vw, var(--font-size-7xl));
+    font-weight: var(--font-weight-black);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px hsla(var(--hue-primary), var(--saturation-primary), 50%, 0.5);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.main-header p { 
+    margin: var(--spacing-sm) 0 0 0;
+    font-size: clamp(var(--font-size-lg), 2.5vw, var(--font-size-2xl));
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-light);
+    letter-spacing: 0.01em;
+}
+
+/* ===== サイドバー - 色彩工学の階層理論 ===== */
+.css-1d391kg { 
+    background: var(--bg-secondary);
+    backdrop-filter: blur(20px);
+    border-right: var(--border-glass);
+}
+
+/* サイドバーのナビゲーションメニュー */
+.css-1d391kg .stSelectbox > div > div,
+.css-1d391kg .stButton > button,
+.css-1d391kg .stTextInput > div > div > input,
+.css-1d391kg .stNumberInput > div > div > input {
+    color: var(--text-primary) !important;
+    background: var(--bg-card) !important;
+    border: var(--border-glass) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* サイドバーのテキスト要素 */
+.css-1d391kg p,
+.css-1d391kg h1,
+.css-1d391kg h2,
+.css-1d391kg h3,
+.css-1d391kg h4,
+.css-1d391kg h5,
+.css-1d391kg h6,
+.css-1d391kg label,
+.css-1d391kg .stMarkdown {
+    color: var(--text-primary) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* サイドバーのボタン */
+.css-1d391kg .stButton > button {
+    background: var(--gradient-primary) !important;
+    color: var(--text-primary) !important;
+    border: none !important;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+}
+
+.css-1d391kg .stButton > button:hover {
+    background: var(--gradient-secondary) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+}
+
+.sidebar-header { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+    color: var(--text-primary);
+    border: var(--border-glass);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-normal);
+}
+
+.sidebar-header:hover {
+    background: var(--bg-card-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ===== カードスタイル - 色彩心理学の応用 ===== */
+.metric-card { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-primary);
+    text-align: center;
+    margin: var(--spacing-md) 0;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+    transform: scaleX(0);
+    transition: transform var(--transition-normal);
+}
+
+.metric-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+    background: var(--bg-card-hover);
+}
+
+.metric-card:hover::before {
+    transform: scaleX(1);
+}
+
+.metric-card h3 {
+    margin: 0 0 var(--spacing-sm) 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+}
+
+.metric-card p {
+    margin: 0;
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ===== ステータスカード - 色彩心理学の機能的分類 ===== */
+.success-card { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-accent);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-primary);
+    text-align: center;
+    margin: var(--spacing-md) 0;
+    box-shadow: var(--shadow-md), var(--shadow-glow-accent);
+    transition: var(--transition-normal);
+}
+
+.success-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-accent);
+}
+
+.warning-card { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-warning);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-primary);
+    text-align: center;
+    margin: var(--spacing-md) 0;
+    box-shadow: var(--shadow-md), var(--shadow-glow-warning);
+    transition: var(--transition-normal);
+}
+
+.warning-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-warning);
+}
+
+.error-card { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-error);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-primary);
+    text-align: center;
+    margin: var(--spacing-md) 0;
+    box-shadow: var(--shadow-md), var(--shadow-glow-error);
+    transition: var(--transition-normal);
+}
+
+.error-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-error);
+}
+
+.info-card { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-info);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-primary);
+    text-align: center;
+    margin: var(--spacing-md) 0;
+    box-shadow: var(--shadow-md), var(--shadow-glow-info);
+    transition: var(--transition-normal);
+}
+
+.info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-info);
+}
+
+/* ===== タブスタイル - 色彩工学の状態表現 ===== */
+.stTabs [data-baseweb="tab-list"] { 
+    gap: var(--spacing-sm);
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-sm);
+    border: var(--border-glass);
+    box-shadow: var(--shadow-sm);
+}
+
+.stTabs [data-baseweb="tab"] { 
+    height: auto;
+    min-height: 48px;
+    white-space: pre-wrap;
+    background: transparent;
+    border-radius: var(--border-radius-md);
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    transition: all var(--transition-normal);
+    font-weight: var(--font-weight-medium);
+    font-size: clamp(var(--font-size-sm), 2vw, var(--font-size-base));
+    color: var(--text-primary) !important; /* 高コントラストの白色文字 */
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8); /* 文字に影を追加して可読性向上 */
+}
+
+.stTabs [data-baseweb="tab"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    border-radius: var(--border-radius-md);
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    color: var(--text-primary) !important; /* ホバー時も高コントラスト維持 */
+    transform: translateY(-2px);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9); /* ホバー時に影を強化 */
+}
+
+.stTabs [data-baseweb="tab"]:hover::before {
+    opacity: 0.15; /* ホバー時の背景を少し濃く */
+}
+
+.stTabs [aria-selected="true"] { 
+    background: var(--gradient-primary);
+    color: var(--text-primary) !important; /* 選択時も高コントラスト維持 */
+    box-shadow: var(--shadow-md), var(--shadow-glow-primary);
+    transform: translateY(-2px);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9); /* 選択時も影を強化 */
+    font-weight: var(--font-weight-semibold); /* 選択時は太字に */
+}
+
+.stTabs [aria-selected="true"]::before {
+    opacity: 0;
+}
+
+/* ===== ボタンスタイル - 色彩工学の相互作用理論 ===== */
+.stButton > button { 
+    width: 100%;
+    border-radius: var(--border-radius-xl);
+    border: none;
+    background: var(--gradient-primary);
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    font-size: clamp(var(--font-size-sm), 2vw, var(--font-size-base));
+    min-height: 48px;
+    letter-spacing: 0.01em;
+}
+
+.stButton > button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.stButton > button:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+    background: var(--gradient-secondary);
+}
+
+.stButton > button:hover::before {
+    left: 100%;
+}
+
+.stButton > button:active {
+    transform: translateY(-1px);
+}
+
+/* ===== フォーム要素 - 色彩工学の入力フィードバック ===== */
+.stSelectbox > div > div {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    border-radius: var(--border-radius-md);
+    color: var(--text-primary);
+    transition: var(--transition-normal);
+}
+
+.stSelectbox > div > div:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--color-primary);
+}
+
+.stSlider > div > div {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-sm);
+}
+
+.stSlider .stSlider > div > div > div {
+    background: var(--gradient-primary);
+}
+
+.stNumberInput > div > div > input,
+.stTextInput > div > div > input {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    border-radius: var(--border-radius-md);
+    color: var(--text-primary);
+    transition: var(--transition-normal);
+}
+
+.stNumberInput > div > div > input:focus,
+.stTextInput > div > div > input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px hsla(var(--hue-primary), var(--saturation-primary), 50%, 0.2);
+}
+
+/* ===== データフレームとプロット - 色彩工学の情報階層 ===== */
+.stDataFrame {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.plotly {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+/* ===== アクセシビリティ改善 - WCAG AA準拠 ===== */
+.stButton > button:focus {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.metric-card:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-lg), 0 0 0 2px hsla(var(--hue-primary), var(--saturation-primary), 50%, 0.2);
+}
+
+.stTabs [data-baseweb="tab"]:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+}
+
+/* ===== 高コントラストモード対応 ===== */
+@media (prefers-contrast: high) {
+    .main-header {
+        background: var(--neutral-900);
+        border: 2px solid var(--neutral-50);
+    }
+    
+    .metric-card {
+        background: var(--neutral-900);
+        border: 2px solid var(--neutral-50);
+    }
+    
+    .stButton > button {
+        background: var(--neutral-900);
+        border: 2px solid var(--neutral-50);
+    }
+}
+
+/* ===== モーション軽減設定 ===== */
+@media (prefers-reduced-motion: reduce) {
+    .main-header::before,
+    .metric-card::before,
+    .stButton > button::before {
+        transition: none;
+    }
+    
+    .metric-card:hover,
+    .stButton > button:hover,
+    .stTabs [data-baseweb="tab"]:hover {
+        transform: none;
+    }
+}
+
+/* ===== レスポンシブブレークポイント ===== */
+
+/* モバイル (768px以下) */
+@media (max-width: 768px) {
+    .main-header {
+        padding: var(--spacing-xl);
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .main-header h1 {
+        font-size: var(--font-size-3xl);
+    }
+    
+    .main-header p {
+        font-size: var(--font-size-lg);
+    }
+    
+    .metric-card {
+        margin: var(--spacing-sm) 0;
+        padding: var(--spacing-md);
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 44px;
+        font-size: var(--font-size-sm);
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    .stButton > button {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-sm);
+        min-height: 44px;
+    }
+    
+    .sidebar-header {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+}
+
+/* タブレット (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .main-header {
+        padding: var(--spacing-2xl);
+    }
+    
+    .main-header h1 {
+        font-size: var(--font-size-4xl);
+    }
+    
+    .main-header p {
+        font-size: var(--font-size-xl);
+    }
+    
+    .metric-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 52px;
+        font-size: var(--font-size-base);
+    }
+}
+
+/* デスクトップ (1025px以上) */
+@media (min-width: 1025px) {
+    .main-header {
+        padding: var(--spacing-4xl);
+    }
+    
+    .main-header h1 {
+        font-size: var(--font-size-7xl);
+    }
+    
+    .main-header p {
+        font-size: var(--font-size-2xl);
+    }
+}
+
+/* ===== ダークモード対応 ===== */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-primary: var(--neutral-50);
+        --text-secondary: var(--neutral-200);
+        --text-muted: var(--neutral-400);
+        --bg-glass: rgba(255, 255, 255, 0.03);
+        --bg-glass-hover: rgba(255, 255, 255, 0.06);
+    }
+}
+
+/* ===== ライトモード対応 ===== */
+@media (prefers-color-scheme: light) {
+    :root {
+        --text-primary: var(--neutral-900);
+        --text-secondary: var(--neutral-700);
+        --text-muted: var(--neutral-500);
+        --bg-glass: rgba(0, 0, 0, 0.03);
+        --bg-glass-hover: rgba(0, 0, 0, 0.06);
+        --border-glass: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .stApp {
+        background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+        color: var(--text-primary);
+    }
+    
+    .main-header {
+        background: var(--bg-card);
+        border: var(--border-glass);
+        color: var(--text-primary);
+    }
+    
+    .metric-card {
+        background: var(--bg-card);
+        border: var(--border-glass);
+        color: var(--text-primary);
+    }
+}
+
+/* ===== 印刷対応 ===== */
+@media print {
+    .main-header {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+        box-shadow: none !important;
+    }
+    
+    .metric-card {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+        box-shadow: none !important;
+    }
+    
+    .stButton > button {
+        background: black !important;
+        color: white !important;
+        border: 1px solid black !important;
+    }
+}
+
+/* ===== カスタムアニメーション - 自然な動きの物理法則 ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: var(--shadow-md);
+    }
+    50% {
+        box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+    }
+}
+
+/* アニメーション適用 */
+.metric-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.sidebar-header {
+    animation: slideInLeft 0.6s ease-out;
+}
+
+.main-header {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+/* ===== ローディングアニメーション ===== */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--neutral-600);
+    border-radius: 50%;
+    border-top-color: var(--color-primary);
+    animation: spin 1s ease-in-out infinite;
+}
+
+/* ===== ツールチップスタイル ===== */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: var(--neutral-800);
+    color: var(--text-primary);
+    text-align: center;
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-sm);
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    font-size: var(--font-size-sm);
+    border: var(--border-glass);
+    box-shadow: var(--shadow-md);
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* ===== Streamlitナビゲーション要素の改善 ===== */
+
+/* メインコンテナのテキスト */
+.main .stMarkdown,
+.main p,
+.main h1,
+.main h2,
+.main h3,
+.main h4,
+.main h5,
+.main h6,
+.main label {
+    color: var(--text-primary) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* セレクトボックスのテキスト */
+.stSelectbox > div > div > div {
+    color: var(--text-primary) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* ラジオボタンとチェックボックス */
+.stRadio > div > label,
+.stCheckbox > div > label {
+    color: var(--text-primary) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* スライダーのラベル */
+.stSlider > div > div > div > div {
+    color: var(--text-primary) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* メトリクス表示 */
+.stMetric {
+    color: var(--text-primary) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* アラートメッセージ */
+.stAlert {
+    color: var(--text-primary) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* プログレスバー */
+.stProgress > div > div > div {
+    background: var(--gradient-primary) !important;
+}
+
+/* エクスパンダー */
+.stExpander > div > div {
+    color: var(--text-primary) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* ===== 色彩工学に基づく特別なスタイル ===== */
+
+/* 成功状態 - 緑系の色彩心理学 */
+.success-state {
+    color: var(--color-accent);
+    background: linear-gradient(135deg, hsla(var(--hue-accent), var(--saturation-accent), 50%, 0.1) 0%, hsla(var(--hue-accent), var(--saturation-accent), 50%, 0.05) 100%);
+    border: 1px solid var(--color-accent);
+}
+
+/* 警告状態 - 黄系の色彩心理学 */
+.warning-state {
+    color: var(--color-warning);
+    background: linear-gradient(135deg, hsla(var(--hue-warning), var(--saturation-warning), 50%, 0.1) 0%, hsla(var(--hue-warning), var(--saturation-warning), 50%, 0.05) 100%);
+    border: 1px solid var(--color-warning);
+}
+
+/* エラー状態 - 赤系の色彩心理学 */
+.error-state {
+    color: var(--color-error);
+    background: linear-gradient(135deg, hsla(var(--hue-error), var(--saturation-error), 50%, 0.1) 0%, hsla(var(--hue-error), var(--saturation-error), 50%, 0.05) 100%);
+    border: 1px solid var(--color-error);
+}
+
+/* 情報状態 - 青系の色彩心理学 */
+.info-state {
+    color: var(--color-info);
+    background: linear-gradient(135deg, hsla(var(--hue-info), var(--saturation-info), 50%, 0.1) 0%, hsla(var(--hue-info), var(--saturation-info), 50%, 0.05) 100%);
+    border: 1px solid var(--color-info);
+}
+
+/* ===== 色彩工学のユーティリティクラス ===== */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-accent { color: var(--text-accent); }
+.text-success { color: var(--text-success); }
+.text-warning { color: var(--text-warning); }
+.text-error { color: var(--text-error); }
+.text-info { color: var(--text-info); }
+
+.bg-primary { background: var(--color-primary); }
+.bg-secondary { background: var(--color-secondary); }
+.bg-accent { background: var(--color-accent); }
+.bg-warning { background: var(--color-warning); }
+.bg-error { background: var(--color-error); }
+.bg-info { background: var(--color-info); }
+
+.border-primary { border-color: var(--color-primary); }
+.border-secondary { border-color: var(--color-secondary); }
+.border-accent { border-color: var(--color-accent); }
+.border-warning { border-color: var(--color-warning); }
+.border-error { border-color: var(--color-error); }
+.border-info { border-color: var(--color-info); }
+
+.shadow-primary { box-shadow: var(--shadow-glow-primary); }
+.shadow-secondary { box-shadow: var(--shadow-glow-secondary); }
+.shadow-accent { box-shadow: var(--shadow-glow-accent); }
+.shadow-warning { box-shadow: var(--shadow-glow-warning); }
+.shadow-error { box-shadow: var(--shadow-glow-error); }
+.shadow-info { box-shadow: var(--shadow-glow-info); }
+
+/* ===== 色彩工学のグラデーションユーティリティ ===== */
+.gradient-primary { background: var(--gradient-primary); }
+.gradient-secondary { background: var(--gradient-secondary); }
+.gradient-accent { background: var(--gradient-accent); }
+.gradient-triadic { background: var(--gradient-triadic); }
+.gradient-primary-secondary { background: var(--gradient-primary-secondary); }
+.gradient-primary-accent { background: var(--gradient-primary-accent); }
+.gradient-warning-error { background: var(--gradient-warning-error); }

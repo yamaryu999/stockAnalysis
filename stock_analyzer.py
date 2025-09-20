@@ -385,24 +385,22 @@ class JapaneseStockAnalyzer:
         
         return metrics
     
-    def screen_stocks(self, stocks_data, criteria):
-        """株をスクリーニング"""
-        screened_stocks = []
+    def analyze_stocks(self, stocks_data):
+        """株を分析"""
+        analyzed_stocks = []
         
         for stock_name, symbol in stocks_data.items():
             stock_data = self.get_stock_data(symbol)
             if stock_data:
                 metrics = self.calculate_financial_metrics(stock_data)
                 if metrics:
-                    # スクリーニング条件をチェック
-                    if self._meets_criteria(metrics, criteria):
-                        metrics['name'] = stock_name
-                        screened_stocks.append(metrics)
+                    metrics['name'] = stock_name
+                    analyzed_stocks.append(metrics)
         
-        return pd.DataFrame(screened_stocks)
+        return pd.DataFrame(analyzed_stocks)
     
     def _meets_criteria(self, metrics, criteria):
-        """スクリーニング条件をチェック"""
+        """分析条件をチェック"""
         conditions = []
         
         # PER条件
@@ -463,13 +461,13 @@ class JapaneseStockAnalyzer:
     def generate_report(self, df):
         """分析レポートを生成"""
         if df.empty:
-            return "スクリーニング条件に合致する銘柄が見つかりませんでした。"
+            return "分析対象の銘柄が見つかりませんでした。"
         
         report = f"""
 # 株価分析レポート
 生成日時: {datetime.now().strftime('%Y年%m月%d日 %H:%M')}
 
-## スクリーニング結果
+## 分析結果
 - 対象銘柄数: {len(df)}銘柄
 
 ## 統計サマリー

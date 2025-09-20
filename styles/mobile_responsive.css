@@ -1,0 +1,517 @@
+/* モバイル対応レスポンシブデザイン */
+
+/* 基本レスポンシブ設定 */
+* {
+    box-sizing: border-box;
+}
+
+/* モバイルファーストアプローチ */
+@media screen and (max-width: 768px) {
+    /* メインコンテナ */
+    .main .block-container {
+        padding: 1rem 0.5rem;
+        max-width: 100%;
+    }
+    
+    /* サイドバー */
+    .css-1d391kg {
+        width: 100% !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 1000 !important;
+        background: rgba(0, 0, 0, 0.95) !important;
+        backdrop-filter: blur(10px) !important;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .css-1d391kg.show {
+        transform: translateX(0);
+    }
+    
+    /* ハンバーガーメニューボタン */
+    .mobile-menu-button {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 1001;
+        background: rgba(102, 126, 234, 0.9);
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    .mobile-menu-button span {
+        display: block;
+        width: 20px;
+        height: 2px;
+        background: white;
+        margin: 3px 0;
+        transition: 0.3s;
+    }
+    
+    /* カラムレイアウト */
+    .stColumns > div {
+        flex-direction: column !important;
+    }
+    
+    .stColumns > div > div {
+        width: 100% !important;
+        margin-bottom: 1rem;
+    }
+    
+    /* メトリクス */
+    .metric-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .metric-container > div {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    /* チャート */
+    .js-plotly-plot {
+        width: 100% !important;
+        height: 300px !important;
+    }
+    
+    /* テーブル */
+    .stDataFrame {
+        overflow-x: auto;
+        font-size: 0.8rem;
+    }
+    
+    /* ボタン */
+    .stButton > button {
+        width: 100%;
+        margin: 0.25rem 0;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    /* 入力フィールド */
+    .stTextInput > div > div > input,
+    .stSelectbox > div > div > select,
+    .stSlider > div > div > div {
+        font-size: 1rem;
+        padding: 0.75rem;
+    }
+    
+    /* タブ */
+    .stTabs > div > div > div {
+        flex-wrap: wrap;
+    }
+    
+    .stTabs > div > div > div > button {
+        flex: 1;
+        min-width: 80px;
+        font-size: 0.8rem;
+        padding: 0.5rem 0.25rem;
+    }
+    
+    /* エキスパンダー */
+    .streamlit-expanderHeader {
+        font-size: 0.9rem;
+        padding: 0.75rem;
+    }
+    
+    /* アラート */
+    .stAlert {
+        margin: 0.5rem 0;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    /* プログレスバー */
+    .stProgress > div > div > div {
+        height: 8px;
+    }
+    
+    /* スピナー */
+    .stSpinner {
+        font-size: 0.9rem;
+    }
+}
+
+/* タブレット対応 */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .main .block-container {
+        padding: 2rem 1rem;
+        max-width: 95%;
+    }
+    
+    .stColumns > div > div {
+        margin-bottom: 1rem;
+    }
+    
+    .js-plotly-plot {
+        height: 400px !important;
+    }
+    
+    .stDataFrame {
+        font-size: 0.9rem;
+    }
+}
+
+/* 大画面対応 */
+@media screen and (min-width: 1025px) {
+    .main .block-container {
+        padding: 3rem 2rem;
+        max-width: 1200px;
+    }
+    
+    .mobile-menu-button {
+        display: none;
+    }
+}
+
+/* タッチデバイス対応 */
+@media (hover: none) and (pointer: coarse) {
+    /* タッチターゲットのサイズを調整 */
+    .stButton > button,
+    .stSelectbox > div > div > select,
+    .stTextInput > div > div > input {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* ホバー効果を無効化 */
+    .stButton > button:hover {
+        transform: none;
+    }
+    
+    /* タッチフィードバック */
+    .stButton > button:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+    .mobile-menu-button {
+        background: rgba(102, 126, 234, 0.9);
+    }
+    
+    .css-1d391kg {
+        background: rgba(0, 0, 0, 0.95) !important;
+    }
+}
+
+/* 高コントラストモード対応 */
+@media (prefers-contrast: high) {
+    .mobile-menu-button {
+        border: 2px solid white;
+    }
+    
+    .stButton > button {
+        border: 2px solid currentColor;
+    }
+}
+
+/* アニメーション設定 */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* カスタムモバイルコンポーネント */
+.mobile-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-metric {
+    text-align: center;
+    padding: 0.75rem;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 8px;
+    margin: 0.25rem;
+}
+
+.mobile-metric .metric-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.mobile-metric .metric-label {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 0.25rem;
+}
+
+.mobile-chart-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.mobile-button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.mobile-button-group .stButton {
+    flex: 1;
+    min-width: 120px;
+}
+
+.mobile-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.mobile-input-group .stTextInput,
+.mobile-input-group .stSelectbox {
+    width: 100%;
+}
+
+.mobile-table-container {
+    overflow-x: auto;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.mobile-table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.mobile-table-container th,
+.mobile-table-container td {
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-table-container th {
+    background: rgba(102, 126, 234, 0.1);
+    font-weight: bold;
+}
+
+.mobile-alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    border-left: 4px solid;
+}
+
+.mobile-alert.success {
+    background: rgba(76, 175, 80, 0.1);
+    border-left-color: #4CAF50;
+    color: #4CAF50;
+}
+
+.mobile-alert.warning {
+    background: rgba(255, 152, 0, 0.1);
+    border-left-color: #FF9800;
+    color: #FF9800;
+}
+
+.mobile-alert.error {
+    background: rgba(244, 67, 54, 0.1);
+    border-left-color: #F44336;
+    color: #F44336;
+}
+
+.mobile-alert.info {
+    background: rgba(33, 150, 243, 0.1);
+    border-left-color: #2196F3;
+    color: #2196F3;
+}
+
+/* レスポンシブグリッド */
+.mobile-grid {
+    display: grid;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.mobile-grid.cols-1 {
+    grid-template-columns: 1fr;
+}
+
+.mobile-grid.cols-2 {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.mobile-grid.cols-3 {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.mobile-grid.cols-4 {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+/* モバイルナビゲーション */
+.mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.5rem;
+    z-index: 999;
+}
+
+.mobile-nav-items {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+    color: #888;
+    text-decoration: none;
+    font-size: 0.7rem;
+    transition: color 0.3s ease;
+}
+
+.mobile-nav-item.active {
+    color: #667eea;
+}
+
+.mobile-nav-item:hover {
+    color: #667eea;
+}
+
+.mobile-nav-item .icon {
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+}
+
+/* スワイプジェスチャー対応 */
+.swipe-container {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+}
+
+.swipe-item {
+    scroll-snap-align: start;
+    min-width: 100%;
+}
+
+/* プルツリフレッシュ */
+.pull-to-refresh {
+    position: relative;
+    overflow: hidden;
+}
+
+.pull-to-refresh-indicator {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(102, 126, 234, 0.9);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    transition: top 0.3s ease;
+}
+
+.pull-to-refresh-indicator.active {
+    top: 10px;
+}
+
+/* モバイル最適化されたフォント */
+@media screen and (max-width: 768px) {
+    body {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    h2 {
+        font-size: 1.3rem;
+    }
+    
+    h3 {
+        font-size: 1.1rem;
+    }
+    
+    h4 {
+        font-size: 1rem;
+    }
+    
+    p {
+        font-size: 0.9rem;
+    }
+}
+
+/* アクセシビリティ対応 */
+@media (prefers-reduced-motion: no-preference) {
+    .mobile-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .mobile-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* フォーカス表示 */
+.mobile-button:focus,
+.mobile-input:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* スクロールバーのカスタマイズ */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.5);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 126, 234, 0.7);
+}

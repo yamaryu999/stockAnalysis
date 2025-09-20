@@ -1,0 +1,1215 @@
+/* 🔍 日本株価分析ツール v5.0 - 視認性改善デザイン */
+
+/* ===== 視認性を重視したCSS変数（科学的カラーパレット） ===== */
+:root {
+    /* 🌈 視認性を最優先とした色相設定 */
+    
+    /* 主要色相 - 高コントラスト比を確保 */
+    --hue-primary: 210;        /* 青系 - 信頼性（高コントラスト） */
+    --hue-secondary: 280;      /* 紫系 - 補色関係（視認性向上） */
+    --hue-accent: 120;         /* 緑系 - 成功（高視認性） */
+    --hue-warning: 45;         /* 黄系 - 注意（警告色） */
+    --hue-error: 0;            /* 赤系 - 危険（最高視認性） */
+    --hue-info: 200;           /* 青緑系 - 情報（中視認性） */
+    
+    /* 🎯 視認性を最優先とした明度と彩度の最適化 */
+    /* WCAG AAA準拠のコントラスト比（7:1以上）を確保 */
+    
+    /* 基本色の明度・彩度設定（最高視認性） */
+    --lightness-primary: 60%;      /* 明るめ - 読みやすさを最大化 */
+    --lightness-secondary: 65%;   /* 明るめ - 補助色として */
+    --lightness-accent: 55%;      /* 中明度 - アクセントとして */
+    --lightness-warning: 70%;     /* 明るめ - 注意喚起 */
+    --lightness-error: 55%;       /* 中明度 - 危険の警告 */
+    --lightness-info: 60%;        /* 明るめ - 情報表示 */
+    
+    /* 彩度設定（視認性を最大化） */
+    --saturation-primary: 85%;      /* 高彩度 - 主要色として */
+    --saturation-secondary: 75%;   /* 高彩度 - 補助色として */
+    --saturation-accent: 90%;       /* 最高彩度 - アクセントとして */
+    --saturation-warning: 95%;      /* 最高彩度 - 注意喚起 */
+    --saturation-error: 90%;        /* 最高彩度 - 危険の警告 */
+    --saturation-info: 80%;         /* 高彩度 - 情報表示 */
+    
+    /* 🎨 HSL色空間での高視認性色定義 */
+    --color-primary: hsl(var(--hue-primary), var(--saturation-primary), var(--lightness-primary));
+    --color-primary-light: hsl(var(--hue-primary), var(--saturation-primary), calc(var(--lightness-primary) + 15%));
+    --color-primary-dark: hsl(var(--hue-primary), var(--saturation-primary), calc(var(--lightness-primary) - 15%));
+    --color-primary-muted: hsl(var(--hue-primary), calc(var(--saturation-primary) - 20%), var(--lightness-primary));
+    
+    --color-secondary: hsl(var(--hue-secondary), var(--saturation-secondary), var(--lightness-secondary));
+    --color-secondary-light: hsl(var(--hue-secondary), var(--saturation-secondary), calc(var(--lightness-secondary) + 15%));
+    --color-secondary-dark: hsl(var(--hue-secondary), var(--saturation-secondary), calc(var(--lightness-secondary) - 15%));
+    --color-secondary-muted: hsl(var(--hue-secondary), calc(var(--saturation-secondary) - 20%), var(--lightness-secondary));
+    
+    --color-accent: hsl(var(--hue-accent), var(--saturation-accent), var(--lightness-accent));
+    --color-accent-light: hsl(var(--hue-accent), var(--saturation-accent), calc(var(--lightness-accent) + 15%));
+    --color-accent-dark: hsl(var(--hue-accent), var(--saturation-accent), calc(var(--lightness-accent) - 15%));
+    --color-accent-muted: hsl(var(--hue-accent), calc(var(--saturation-accent) - 20%), var(--lightness-accent));
+    
+    --color-warning: hsl(var(--hue-warning), var(--saturation-warning), var(--lightness-warning));
+    --color-warning-light: hsl(var(--hue-warning), var(--saturation-warning), calc(var(--lightness-warning) + 15%));
+    --color-warning-dark: hsl(var(--hue-warning), var(--saturation-warning), calc(var(--lightness-warning) - 15%));
+    --color-warning-muted: hsl(var(--hue-warning), calc(var(--saturation-warning) - 20%), var(--lightness-warning));
+    
+    --color-error: hsl(var(--hue-error), var(--saturation-error), var(--lightness-error));
+    --color-error-light: hsl(var(--hue-error), var(--saturation-error), calc(var(--lightness-error) + 15%));
+    --color-error-dark: hsl(var(--hue-error), var(--saturation-error), calc(var(--lightness-error) - 15%));
+    --color-error-muted: hsl(var(--hue-error), calc(var(--saturation-error) - 20%), var(--lightness-error));
+    
+    --color-info: hsl(var(--hue-info), var(--saturation-info), var(--lightness-info));
+    --color-info-light: hsl(var(--hue-info), var(--saturation-info), calc(var(--lightness-info) + 15%));
+    --color-info-dark: hsl(var(--hue-info), var(--saturation-info), calc(var(--lightness-info) - 15%));
+    --color-info-muted: hsl(var(--hue-info), calc(var(--saturation-info) - 20%), var(--lightness-info));
+    
+    /* 🌟 高視認性グラデーション */
+    --gradient-primary: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, var(--color-primary-light) 100%);
+    --gradient-secondary: linear-gradient(135deg, var(--color-secondary-dark) 0%, var(--color-secondary) 50%, var(--color-secondary-light) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--color-accent-dark) 0%, var(--color-accent) 50%, var(--color-accent-light) 100%);
+    --gradient-warning: linear-gradient(135deg, var(--color-warning-dark) 0%, var(--color-warning) 50%, var(--color-warning-light) 100%);
+    --gradient-error: linear-gradient(135deg, var(--color-error-dark) 0%, var(--color-error) 50%, var(--color-error-light) 100%);
+    --gradient-info: linear-gradient(135deg, var(--color-info-dark) 0%, var(--color-info) 50%, var(--color-info-light) 100%);
+    
+    /* 🎯 高コントラストニュートラルカラー */
+    /* 視認性を最大化したグレースケール */
+    --neutral-0: hsl(0, 0%, 100%);    /* 純白 */
+    --neutral-50: hsl(0, 0%, 98%);     /* ほぼ白 */
+    --neutral-100: hsl(0, 0%, 95%);    /* 非常に薄いグレー */
+    --neutral-200: hsl(0, 0%, 90%);     /* 薄いグレー */
+    --neutral-300: hsl(0, 0%, 80%);     /* 明るいグレー */
+    --neutral-400: hsl(0, 0%, 70%);     /* 中程度のグレー */
+    --neutral-500: hsl(0, 0%, 50%);     /* 中間グレー */
+    --neutral-600: hsl(0, 0%, 35%);     /* 暗いグレー */
+    --neutral-700: hsl(0, 0%, 25%);     /* より暗いグレー */
+    --neutral-800: hsl(0, 0%, 15%);     /* 非常に暗いグレー */
+    --neutral-900: hsl(0, 0%, 8%);      /* ほぼ黒 */
+    --neutral-950: hsl(0, 0%, 3%);      /* 純黒 */
+    
+    /* 🌈 高コントラスト背景グラデーション */
+    --bg-primary: linear-gradient(135deg, 
+        var(--neutral-950) 0%, 
+        var(--neutral-900) 25%, 
+        var(--neutral-800) 50%, 
+        var(--neutral-700) 75%, 
+        var(--neutral-600) 100%);
+    
+    --bg-secondary: linear-gradient(135deg, 
+        var(--neutral-800) 0%, 
+        var(--neutral-700) 50%, 
+        var(--neutral-600) 100%);
+    
+    --bg-glass: rgba(255, 255, 255, 0.08);
+    --bg-glass-hover: rgba(255, 255, 255, 0.12);
+    --bg-card: var(--neutral-800);
+    --bg-card-hover: var(--neutral-700);
+    
+    /* 📝 高コントラストテキストカラー */
+    /* WCAG AAA準拠のコントラスト比（7:1以上） */
+    --text-primary: var(--neutral-0);      /* コントラスト比 21:1 */
+    --text-secondary: var(--neutral-100);  /* コントラスト比 19:1 */
+    --text-muted: var(--neutral-200);      /* コントラスト比 16:1 */
+    --text-accent: var(--color-primary-light);
+    --text-success: var(--color-accent-light);
+    --text-warning: var(--color-warning-light);
+    --text-error: var(--color-error-light);
+    --text-info: var(--color-info-light);
+    
+    /* 🌟 高視認性シャドウ */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.6);
+    --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.7);
+    --shadow-2xl: 0 24px 48px rgba(0, 0, 0, 0.8);
+    
+    /* 高視認性グロー効果 */
+    --shadow-glow-primary: 0 0 20px hsla(var(--hue-primary), var(--saturation-primary), 60%, 0.5);
+    --shadow-glow-secondary: 0 0 20px hsla(var(--hue-secondary), var(--saturation-secondary), 60%, 0.5);
+    --shadow-glow-accent: 0 0 20px hsla(var(--hue-accent), var(--saturation-accent), 60%, 0.5);
+    --shadow-glow-warning: 0 0 20px hsla(var(--hue-warning), var(--saturation-warning), 60%, 0.5);
+    --shadow-glow-error: 0 0 20px hsla(var(--hue-error), var(--saturation-error), 60%, 0.5);
+    --shadow-glow-info: 0 0 20px hsla(var(--hue-info), var(--saturation-info), 60%, 0.5);
+    
+    /* 🎨 高視認性ボーダー */
+    --border-radius-xs: 4px;
+    --border-radius-sm: 6px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-xl: 16px;
+    --border-radius-2xl: 24px;
+    --border-radius-full: 9999px;
+    
+    --border-primary: 2px solid var(--color-primary);
+    --border-secondary: 2px solid var(--color-secondary);
+    --border-accent: 2px solid var(--color-accent);
+    --border-warning: 2px solid var(--color-warning);
+    --border-error: 2px solid var(--color-error);
+    --border-info: 2px solid var(--color-info);
+    --border-neutral: 2px solid var(--neutral-500);
+    --border-glass: 2px solid rgba(255, 255, 255, 0.2);
+    
+    /* 📏 スペーシング - 視認性を考慮 */
+    --spacing-xs: 0.25rem;    /* 4px */
+    --spacing-sm: 0.5rem;     /* 8px */
+    --spacing-md: 1rem;       /* 16px */
+    --spacing-lg: 1.5rem;     /* 24px */
+    --spacing-xl: 2rem;       /* 32px */
+    --spacing-2xl: 3rem;       /* 48px */
+    --spacing-3xl: 4rem;       /* 64px */
+    --spacing-4xl: 6rem;       /* 96px */
+    
+    /* ⚡ トランジション - 視認性を考慮 */
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* 🔤 フォント - 高視認性設定 */
+    --font-family-primary: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    --font-family-display: 'Inter', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+    
+    --font-weight-thin: 100;
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    --font-weight-black: 900;
+    
+    /* 高視認性タイポグラフィスケール */
+    --font-size-xs: 0.875rem;   /* 14px - 最小サイズ */
+    --font-size-sm: 1rem;       /* 16px - 基本サイズ */
+    --font-size-base: 1.125rem;  /* 18px - 読みやすいサイズ */
+    --font-size-lg: 1.25rem;    /* 20px */
+    --font-size-xl: 1.5rem;     /* 24px */
+    --font-size-2xl: 1.875rem;  /* 30px */
+    --font-size-3xl: 2.25rem;   /* 36px */
+    --font-size-4xl: 3rem;      /* 48px */
+    --font-size-5xl: 3.75rem;   /* 60px */
+    --font-size-6xl: 4.5rem;    /* 72px */
+    --font-size-7xl: 6rem;      /* 96px */
+}
+
+/* ===== グローバルスタイル ===== */
+* {
+    box-sizing: border-box;
+}
+
+.main { 
+    padding: 0 !important; 
+}
+
+.stApp { 
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-family: var(--font-family-primary);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.7; /* 行間を広げて読みやすく */
+    font-size: var(--font-size-base); /* 基本フォントサイズを大きく */
+}
+
+/* ===== 高視認性スクロールバー ===== */
+::-webkit-scrollbar {
+    width: 12px; /* スクロールバーを太く */
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--neutral-800);
+    border-radius: var(--border-radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gradient-primary);
+    border-radius: var(--border-radius-sm);
+    border: 2px solid var(--neutral-800);
+    transition: var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gradient-secondary);
+}
+
+/* ===== メインヘッダー - 高視認性設計 ===== */
+.main-header { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    padding: var(--spacing-4xl);
+    border-radius: var(--border-radius-2xl);
+    margin-bottom: var(--spacing-3xl);
+    text-align: center;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-xl), var(--shadow-glow-primary);
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition-normal);
+}
+
+.main-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--gradient-primary);
+    opacity: 0.1;
+    transition: left 0.8s ease;
+}
+
+.main-header:hover::before {
+    left: 100%;
+}
+
+.main-header:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-2xl), var(--shadow-glow-accent);
+}
+
+.main-header h1 { 
+    margin: 0;
+    font-size: clamp(var(--font-size-4xl), 5vw, var(--font-size-7xl));
+    font-weight: var(--font-weight-black);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px hsla(var(--hue-primary), var(--saturation-primary), 60%, 0.7);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.main-header p { 
+    margin: var(--spacing-sm) 0 0 0;
+    font-size: clamp(var(--font-size-lg), 2.5vw, var(--font-size-2xl));
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-medium); /* フォントウェイトを上げて視認性向上 */
+    letter-spacing: 0.01em;
+}
+
+/* ===== サイドバー - 高視認性設計 ===== */
+.css-1d391kg { 
+    background: var(--bg-secondary);
+    backdrop-filter: blur(20px);
+    border-right: var(--border-glass);
+}
+
+/* サイドバーのナビゲーションメニュー */
+.css-1d391kg .stSelectbox > div > div,
+.css-1d391kg .stButton > button,
+.css-1d391kg .stTextInput > div > div > input,
+.css-1d391kg .stNumberInput > div > div > input {
+    color: var(--text-primary) !important;
+    background: var(--bg-card) !important;
+    border: var(--border-glass) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* サイドバーのテキスト要素 */
+.css-1d391kg p,
+.css-1d391kg h1,
+.css-1d391kg h2,
+.css-1d391kg h3,
+.css-1d391kg h4,
+.css-1d391kg h5,
+.css-1d391kg h6,
+.css-1d391kg label,
+.css-1d391kg .stMarkdown {
+    color: var(--text-primary) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* サイドバーのボタン */
+.css-1d391kg .stButton > button {
+    background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%) !important; /* 鮮明な緑グラデーション */
+    color: #ffffff !important; /* 純白のテキスト */
+    border: 4px solid #ffffff !important; /* 白いボーダーで高コントラスト */
+    box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4), 0 0 20px rgba(16, 185, 129, 0.3) !important; /* 緑のグロー効果 */
+    transition: all var(--transition-normal);
+    font-size: var(--font-size-lg) !important; /* フォントサイズを大きく */
+    min-height: 64px !important; /* 高さを増やす */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important; /* テキストシャドウを追加 */
+}
+
+.css-1d391kg .stButton > button:hover {
+    background: linear-gradient(135deg, #047857 0%, #059669 50%, #10b981 100%) !important; /* ホバー時の濃い緑グラデーション */
+    transform: translateY(-4px) !important; /* ホバー時の移動を増やす */
+    box-shadow: 0 12px 35px rgba(5, 150, 105, 0.6), 0 0 30px rgba(16, 185, 129, 0.5) !important; /* ホバー時のシャドウを強化 */
+    border-color: #fbbf24 !important; /* ホバー時の黄色ボーダーで高コントラスト */
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.9) !important; /* ホバー時のテキストシャドウを強化 */
+}
+
+.sidebar-header { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+    color: var(--text-primary);
+    border: var(--border-glass);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-normal);
+}
+
+.sidebar-header:hover {
+    background: var(--bg-card-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.sidebar-header h2 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+.sidebar-header p {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+}
+
+/* ===== カードスタイル - 高視認性設計 ===== */
+.metric-card { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: 3px solid var(--color-primary) !important; /* ボーダーを強化 */
+    padding: var(--spacing-xl); /* パディングを増やして視認性向上 */
+    border-radius: var(--border-radius-lg);
+    color: var(--text-primary);
+    text-align: center;
+    margin: var(--spacing-lg) 0; /* マージンを増やして視認性向上 */
+    box-shadow: var(--shadow-lg), var(--shadow-glow-primary) !important; /* シャドウを強化 */
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px; /* ボーダーを太く */
+    background: var(--gradient-primary);
+    transform: scaleX(0);
+    transition: transform var(--transition-normal);
+}
+
+.metric-card:hover {
+    transform: translateY(-12px) !important; /* ホバー時の移動を増やす */
+    box-shadow: var(--shadow-2xl), var(--shadow-glow-accent) !important; /* ホバー時のシャドウを強化 */
+    background: var(--bg-card-hover);
+    border-color: var(--color-accent) !important; /* ホバー時のボーダー色を変更 */
+}
+
+.metric-card:hover::before {
+    transform: scaleX(1);
+}
+
+.metric-card h3 {
+    margin: 0 0 var(--spacing-md) 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+}
+
+.metric-card p {
+    margin: 0;
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.metric-card .metric-label {
+    margin-top: var(--spacing-sm);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-muted);
+}
+
+/* ===== ステータスカード - 高視認性設計 ===== */
+.success-card { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-accent);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-primary);
+    text-align: center;
+    margin: var(--spacing-lg) 0;
+    box-shadow: var(--shadow-md), var(--shadow-glow-accent);
+    transition: var(--transition-normal);
+}
+
+.success-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-accent);
+}
+
+.warning-card { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-warning);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-primary);
+    text-align: center;
+    margin: var(--spacing-lg) 0;
+    box-shadow: var(--shadow-md), var(--shadow-glow-warning);
+    transition: var(--transition-normal);
+}
+
+.warning-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-warning);
+}
+
+.error-card { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-error);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-primary);
+    text-align: center;
+    margin: var(--spacing-lg) 0;
+    box-shadow: var(--shadow-md), var(--shadow-glow-error);
+    transition: var(--transition-normal);
+}
+
+.error-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-error);
+}
+
+.info-card { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-info);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-primary);
+    text-align: center;
+    margin: var(--spacing-lg) 0;
+    box-shadow: var(--shadow-md), var(--shadow-glow-info);
+    transition: var(--transition-normal);
+}
+
+.info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-info);
+}
+
+/* ===== タブスタイル - 高視認性設計 ===== */
+.stTabs [data-baseweb="tab-list"] { 
+    gap: var(--spacing-sm);
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-sm);
+    border: var(--border-glass);
+    box-shadow: var(--shadow-sm);
+}
+
+.stTabs [data-baseweb="tab"] { 
+    height: auto;
+    min-height: 56px; /* タブの高さを増やして視認性向上 */
+    white-space: pre-wrap;
+    background: transparent;
+    border-radius: var(--border-radius-md);
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg); /* パディングを増やす */
+    border: none;
+    transition: all var(--transition-normal);
+    font-weight: var(--font-weight-semibold); /* フォントウェイトを上げる */
+    font-size: var(--font-size-base); /* フォントサイズを大きく */
+    color: var(--text-primary) !important; /* 高コントラストの白色文字 */
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9); /* 文字に影を追加して可読性向上 */
+}
+
+.stTabs [data-baseweb="tab"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    border-radius: var(--border-radius-md);
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    color: var(--text-primary) !important; /* ホバー時も高コントラスト維持 */
+    transform: translateY(-2px);
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.95); /* ホバー時に影を強化 */
+}
+
+.stTabs [data-baseweb="tab"]:hover::before {
+    opacity: 0.15; /* ホバー時の背景を少し濃く */
+}
+
+.stTabs [aria-selected="true"] { 
+    background: var(--gradient-primary);
+    color: var(--text-primary) !important; /* 選択時も高コントラスト維持 */
+    box-shadow: var(--shadow-md), var(--shadow-glow-primary);
+    transform: translateY(-2px);
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.95); /* 選択時も影を強化 */
+    font-weight: var(--font-weight-bold); /* 選択時は太字に */
+}
+
+.stTabs [aria-selected="true"]::before {
+    opacity: 0;
+}
+
+/* ===== ボタンスタイル - 高視認性設計 ===== */
+.stButton > button { 
+    width: 100%;
+    border-radius: var(--border-radius-xl);
+    border: 4px solid #ffffff !important; /* 白いボーダーで高コントラスト */
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%) !important; /* 鮮明な青グラデーション */
+    color: #ffffff !important; /* 純白のテキスト */
+    font-weight: var(--font-weight-bold); /* フォントウェイトを上げる */
+    padding: var(--spacing-md) var(--spacing-xl); /* パディングを増やす */
+    transition: all var(--transition-normal);
+    box-shadow: 0 8px 25px rgba(30, 64, 175, 0.4), 0 0 20px rgba(59, 130, 246, 0.3) !important; /* 青いグロー効果 */
+    position: relative;
+    overflow: hidden;
+    font-size: var(--font-size-lg) !important; /* フォントサイズをさらに大きく */
+    min-height: 64px !important; /* ボタンの高さをさらに増やす */
+    letter-spacing: 0.02em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important; /* テキストシャドウを追加 */
+}
+
+/* Netflixスタイルのボタンも改善 */
+.netflix-quick-btn {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%) !important; /* 鮮明な青グラデーション */
+    color: #ffffff !important; /* 純白のテキスト */
+    border: 4px solid #ffffff !important; /* 白いボーダーで高コントラスト */
+    border-radius: 12px !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    padding: 12px 24px !important;
+    min-height: 48px !important;
+    box-shadow: 0 8px 25px rgba(30, 64, 175, 0.4), 0 0 20px rgba(59, 130, 246, 0.3) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+    transition: all 0.3s ease !important;
+}
+
+.netflix-quick-btn:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%) !important;
+    border-color: #fbbf24 !important; /* ホバー時の黄色ボーダー */
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 35px rgba(30, 64, 175, 0.6), 0 0 30px rgba(59, 130, 246, 0.5) !important;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.9) !important;
+}
+
+.netflix-quick-btn:active {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%) !important;
+    transform: translateY(0px) !important;
+    box-shadow: 0 6px 20px rgba(30, 64, 175, 0.5), 0 0 15px rgba(59, 130, 246, 0.4) !important;
+}
+
+/* Streamlitの動的クラス（st-emotion-cache-*）のボタンを改善 */
+button[class*="st-emotion-cache"][class*="e1haskxa2"] {
+    background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%) !important; /* 鮮明な緑グラデーション */
+    color: #ffffff !important; /* 純白のテキスト */
+    border: 4px solid #ffffff !important; /* 白いボーダーで高コントラスト */
+    border-radius: 12px !important;
+    font-weight: bold !important;
+    font-size: 18px !important;
+    padding: 12px 24px !important;
+    min-height: 48px !important;
+    box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4), 0 0 20px rgba(16, 185, 129, 0.3) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+    transition: all 0.3s ease !important;
+}
+
+button[class*="st-emotion-cache"][class*="e1haskxa2"]:hover {
+    background: linear-gradient(135deg, #047857 0%, #059669 50%, #10b981 100%) !important;
+    border-color: #fbbf24 !important; /* ホバー時の黄色ボーダー */
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 35px rgba(5, 150, 105, 0.6), 0 0 30px rgba(16, 185, 129, 0.5) !important;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.9) !important;
+}
+
+button[class*="st-emotion-cache"][class*="e1haskxa2"]:active {
+    background: linear-gradient(135deg, #065f46 0%, #047857 50%, #059669 100%) !important;
+    transform: translateY(0px) !important;
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.5), 0 0 15px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* StreamlitのstButtonクラスのボタンを改善 */
+.stButton[class*="st-emotion-cache"][class*="e1mlolmg0"] {
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 50%, #a78bfa 100%) !important; /* 鮮明な紫グラデーション */
+    color: #ffffff !important; /* 純白のテキスト */
+    border: 4px solid #ffffff !important; /* 白いボーダーで高コントラスト */
+    border-radius: 12px !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    padding: 12px 24px !important;
+    min-height: 48px !important;
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4), 0 0 20px rgba(139, 92, 246, 0.3) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+    transition: all 0.3s ease !important;
+}
+
+.stButton[class*="st-emotion-cache"][class*="e1mlolmg0"]:hover {
+    background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 50%, #8b5cf6 100%) !important;
+    border-color: #fbbf24 !important; /* ホバー時の黄色ボーダー */
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 35px rgba(124, 58, 237, 0.6), 0 0 30px rgba(139, 92, 246, 0.5) !important;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.9) !important;
+}
+
+.stButton[class*="st-emotion-cache"][class*="e1mlolmg0"]:active {
+    background: linear-gradient(135deg, #5b21b6 0%, #6d28d9 50%, #7c3aed 100%) !important;
+    transform: translateY(0px) !important;
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5), 0 0 15px rgba(139, 92, 246, 0.4) !important;
+}
+
+/* ナビゲーションテキストの配色改善 */
+.netflix-nav-text {
+    color: #ffffff !important; /* 純白のテキスト */
+    font-weight: bold !important; /* 太字で視認性向上 */
+    font-size: 18px !important; /* フォントサイズを大きく */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important; /* テキストシャドウで視認性向上 */
+    transition: all 0.3s ease !important; /* スムーズなトランジション */
+    padding: 8px 16px !important; /* パディングを追加 */
+    border-radius: 8px !important; /* 角丸を追加 */
+    background: rgba(255, 255, 255, 0.1) !important; /* 半透明の背景 */
+    border: 2px solid rgba(255, 255, 255, 0.3) !important; /* 半透明のボーダー */
+}
+
+.netflix-nav-text:hover {
+    color: #fbbf24 !important; /* ホバー時の黄色テキスト */
+    background: rgba(251, 191, 36, 0.2) !important; /* ホバー時の黄色背景 */
+    border-color: #fbbf24 !important; /* ホバー時の黄色ボーダー */
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.9) !important; /* ホバー時の強化されたシャドウ */
+    transform: translateY(-2px) !important; /* ホバー時の上移動 */
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3) !important; /* ホバー時のグロー効果 */
+}
+
+/* 分析タイトルの配色改善 */
+span:contains("リアルタイム分析") {
+    color: #60a5fa !important; /* 明るい青のテキスト */
+    font-weight: bold !important; /* 太字で視認性向上 */
+    font-size: 20px !important; /* フォントサイズを大きく */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important; /* テキストシャドウ */
+    background: linear-gradient(135deg, rgba(30, 64, 175, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%) !important; /* 青のグラデーション背景 */
+    padding: 12px 20px !important; /* パディングを追加 */
+    border-radius: 12px !important; /* 角丸を追加 */
+    border: 2px solid rgba(59, 130, 246, 0.5) !important; /* 青のボーダー */
+    display: inline-block !important; /* インラインブロック要素として表示 */
+    transition: all 0.3s ease !important; /* スムーズなトランジション */
+}
+
+span:contains("リアルタイム分析"):hover {
+    color: #ffffff !important; /* ホバー時の白テキスト */
+    background: linear-gradient(135deg, rgba(30, 64, 175, 0.4) 0%, rgba(59, 130, 246, 0.4) 100%) !important; /* ホバー時の濃い青背景 */
+    border-color: #fbbf24 !important; /* ホバー時の黄色ボーダー */
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.9) !important; /* ホバー時の強化されたシャドウ */
+    transform: translateY(-2px) !important; /* ホバー時の上移動 */
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4) !important; /* ホバー時の青グロー効果 */
+}
+
+.stButton > button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s ease;
+}
+
+.stButton > button:hover {
+    transform: translateY(-4px) !important; /* ホバー時の移動を増やす */
+    box-shadow: 0 12px 35px rgba(30, 64, 175, 0.6), 0 0 30px rgba(59, 130, 246, 0.5) !important; /* ホバー時のシャドウを強化 */
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%) !important; /* ホバー時の鮮明な青グラデーション */
+    border-color: #fbbf24 !important; /* ホバー時の黄色ボーダーで高コントラスト */
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.9) !important; /* ホバー時のテキストシャドウを強化 */
+}
+
+.stButton > button:hover::before {
+    left: 100%;
+}
+
+.stButton > button:active {
+    transform: translateY(-2px) !important; /* アクティブ時の移動を増やす */
+    box-shadow: 0 6px 20px rgba(30, 64, 175, 0.5), 0 0 15px rgba(59, 130, 246, 0.4) !important;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%) !important; /* アクティブ時の濃い青 */
+}
+
+.stButton > button:focus {
+    outline: 4px solid #fbbf24 !important; /* フォーカス時の黄色アウトラインで高コントラスト */
+    outline-offset: 3px !important;
+}
+
+/* ===== フォーム要素 - 高視認性設計 ===== */
+.stSelectbox > div > div {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    border-radius: var(--border-radius-md);
+    color: var(--text-primary);
+    transition: var(--transition-normal);
+    font-size: var(--font-size-base);
+    padding: var(--spacing-sm);
+}
+
+.stSelectbox > div > div:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--color-primary);
+}
+
+.stSlider > div > div {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md);
+}
+
+.stSlider .stSlider > div > div > div {
+    background: var(--gradient-primary);
+}
+
+.stNumberInput > div > div > input,
+.stTextInput > div > div > input {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    border-radius: var(--border-radius-md);
+    color: var(--text-primary);
+    transition: var(--transition-normal);
+    font-size: var(--font-size-base);
+    padding: var(--spacing-sm);
+}
+
+.stNumberInput > div > div > input:focus,
+.stTextInput > div > div > input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px hsla(var(--hue-primary), var(--saturation-primary), 60%, 0.3);
+}
+
+/* ===== データフレームとプロット - 高視認性設計 ===== */
+.stDataFrame {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.plotly {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+/* ===== アクセシビリティ改善 - WCAG AAA準拠 ===== */
+.stButton > button:focus {
+    outline: 4px solid var(--color-primary);
+    outline-offset: 3px;
+}
+
+.metric-card:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-lg), 0 0 0 3px hsla(var(--hue-primary), var(--saturation-primary), 60%, 0.3);
+}
+
+.stTabs [data-baseweb="tab"]:focus {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* ===== 高コントラストモード対応 ===== */
+@media (prefers-contrast: high) {
+    .main-header {
+        background: var(--neutral-900);
+        border: 3px solid var(--neutral-0);
+    }
+    
+    .metric-card {
+        background: var(--neutral-900);
+        border: 3px solid var(--neutral-0);
+    }
+    
+    .stButton > button {
+        background: var(--neutral-900);
+        border: 3px solid var(--neutral-0);
+    }
+}
+
+/* ===== モーション軽減設定 ===== */
+@media (prefers-reduced-motion: reduce) {
+    .main-header::before,
+    .metric-card::before,
+    .stButton > button::before {
+        transition: none;
+    }
+    
+    .metric-card:hover,
+    .stButton > button:hover,
+    .stTabs [data-baseweb="tab"]:hover {
+        transform: none;
+    }
+}
+
+/* ===== レスポンシブブレークポイント ===== */
+
+/* モバイル (768px以下) */
+@media (max-width: 768px) {
+    .main-header {
+        padding: var(--spacing-xl);
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .main-header h1 {
+        font-size: var(--font-size-3xl);
+    }
+    
+    .main-header p {
+        font-size: var(--font-size-lg);
+    }
+    
+    .metric-card {
+        margin: var(--spacing-sm) 0;
+        padding: var(--spacing-lg);
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 48px;
+        font-size: var(--font-size-sm);
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .stButton > button {
+        padding: var(--spacing-sm) var(--spacing-lg);
+        font-size: var(--font-size-sm);
+        min-height: 48px;
+    }
+    
+    .sidebar-header {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+}
+
+/* タブレット (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .main-header {
+        padding: var(--spacing-2xl);
+    }
+    
+    .main-header h1 {
+        font-size: var(--font-size-4xl);
+    }
+    
+    .main-header p {
+        font-size: var(--font-size-xl);
+    }
+    
+    .metric-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 52px;
+        font-size: var(--font-size-base);
+    }
+}
+
+/* デスクトップ (1025px以上) */
+@media (min-width: 1025px) {
+    .main-header {
+        padding: var(--spacing-4xl);
+    }
+    
+    .main-header h1 {
+        font-size: var(--font-size-7xl);
+    }
+    
+    .main-header p {
+        font-size: var(--font-size-2xl);
+    }
+}
+
+/* ===== ダークモード対応 ===== */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-primary: var(--neutral-0);
+        --text-secondary: var(--neutral-100);
+        --text-muted: var(--neutral-200);
+        --bg-glass: rgba(255, 255, 255, 0.08);
+        --bg-glass-hover: rgba(255, 255, 255, 0.12);
+    }
+}
+
+/* ===== ライトモード対応 ===== */
+@media (prefers-color-scheme: light) {
+    :root {
+        --text-primary: var(--neutral-900);
+        --text-secondary: var(--neutral-700);
+        --text-muted: var(--neutral-500);
+        --bg-glass: rgba(0, 0, 0, 0.08);
+        --bg-glass-hover: rgba(0, 0, 0, 0.12);
+        --border-glass: 2px solid rgba(0, 0, 0, 0.2);
+    }
+    
+    .stApp {
+        background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+        color: var(--text-primary);
+    }
+    
+    .main-header {
+        background: var(--bg-card);
+        border: var(--border-glass);
+        color: var(--text-primary);
+    }
+    
+    .metric-card {
+        background: var(--bg-card);
+        border: var(--border-glass);
+        color: var(--text-primary);
+    }
+}
+
+/* ===== 印刷対応 ===== */
+@media print {
+    .main-header {
+        background: white !important;
+        color: black !important;
+        border: 2px solid black !important;
+        box-shadow: none !important;
+    }
+    
+    .metric-card {
+        background: white !important;
+        color: black !important;
+        border: 2px solid black !important;
+        box-shadow: none !important;
+    }
+    
+    .stButton > button {
+        background: black !important;
+        color: white !important;
+        border: 2px solid black !important;
+    }
+}
+
+/* ===== 高視認性アニメーション ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: var(--shadow-md);
+    }
+    50% {
+        box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+    }
+}
+
+/* アニメーション適用 */
+.metric-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.sidebar-header {
+    animation: slideInLeft 0.6s ease-out;
+}
+
+.main-header {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+/* ===== 高視認性ローディングアニメーション ===== */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 24px; /* スピナーを大きく */
+    height: 24px;
+    border: 4px solid var(--neutral-600); /* ボーダーを太く */
+    border-radius: 50%;
+    border-top-color: var(--color-primary);
+    animation: spin 1s ease-in-out infinite;
+}
+
+/* ===== 高視認性ツールチップスタイル ===== */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 250px; /* ツールチップを大きく */
+    background-color: var(--neutral-800);
+    color: var(--text-primary);
+    text-align: center;
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md); /* パディングを増やす */
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -125px;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    font-size: var(--font-size-base); /* フォントサイズを大きく */
+    border: var(--border-glass);
+    box-shadow: var(--shadow-md);
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* ===== 高視認性ユーティリティクラス ===== */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-accent { color: var(--text-accent); }
+.text-success { color: var(--text-success); }
+.text-warning { color: var(--text-warning); }
+.text-error { color: var(--text-error); }
+.text-info { color: var(--text-info); }
+
+.bg-primary { background: var(--color-primary); }
+.bg-secondary { background: var(--color-secondary); }
+.bg-accent { background: var(--color-accent); }
+.bg-warning { background: var(--color-warning); }
+.bg-error { background: var(--color-error); }
+.bg-info { background: var(--color-info); }
+
+.border-primary { border-color: var(--color-primary); }
+.border-secondary { border-color: var(--color-secondary); }
+.border-accent { border-color: var(--color-accent); }
+.border-warning { border-color: var(--color-warning); }
+.border-error { border-color: var(--color-error); }
+.border-info { border-color: var(--color-info); }
+
+.shadow-primary { box-shadow: var(--shadow-glow-primary); }
+.shadow-secondary { box-shadow: var(--shadow-glow-secondary); }
+.shadow-accent { box-shadow: var(--shadow-glow-accent); }
+.shadow-warning { box-shadow: var(--shadow-glow-warning); }
+.shadow-error { box-shadow: var(--shadow-glow-error); }
+.shadow-info { box-shadow: var(--shadow-glow-info); }
+
+/* ===== 高視認性グラデーションユーティリティ ===== */
+.gradient-primary { background: var(--gradient-primary); }
+.gradient-secondary { background: var(--gradient-secondary); }
+.gradient-accent { background: var(--gradient-accent); }
+.gradient-warning { background: var(--gradient-warning); }
+.gradient-error { background: var(--gradient-error); }
+.gradient-info { background: var(--gradient-info); }
+
+/* ===== Streamlitナビゲーション要素の改善 ===== */
+
+/* メインコンテナのテキスト */
+.main .stMarkdown,
+.main p,
+.main h1,
+.main h2,
+.main h3,
+.main h4,
+.main h5,
+.main h6,
+.main label {
+    color: var(--text-primary) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* セレクトボックスのテキスト */
+.stSelectbox > div > div > div {
+    color: var(--text-primary) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* ラジオボタンとチェックボックス */
+.stRadio > div > label,
+.stCheckbox > div > label {
+    color: var(--text-primary) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* スライダーのラベル */
+.stSlider > div > div > div > div {
+    color: var(--text-primary) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* メトリクス表示 */
+.stMetric {
+    color: var(--text-primary) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* アラートメッセージ */
+.stAlert {
+    color: var(--text-primary) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* プログレスバー */
+.stProgress > div > div > div {
+    background: var(--gradient-primary) !important;
+}
+
+/* エクスパンダー */
+.stExpander > div > div {
+    color: var(--text-primary) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+}

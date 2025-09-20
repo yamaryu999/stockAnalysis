@@ -1,0 +1,888 @@
+/* 🎨 日本株価分析ツール v5.0 - 色彩学ベースデザイン */
+
+/* ===== 色彩学に基づくCSS変数（デザインシステム） ===== */
+:root {
+    /* 🎨 色彩学の原則に基づくカラーパレット */
+    
+    /* 基本色相 - 補色関係を活用 */
+    --primary-hue: 220;        /* 青系 - 信頼性と安定性を表現 */
+    --secondary-hue: 40;       /* 黄系 - 注意と活力を表現 */
+    --accent-hue: 160;         /* 緑系 - 成長と成功を表現 */
+    --warning-hue: 15;         /* オレンジ系 - 警告と注意を表現 */
+    --error-hue: 0;            /* 赤系 - 危険と停止を表現 */
+    
+    /* 明度と彩度の調整 - アクセシビリティを考慮 */
+    --lightness-primary: 50%;   /* 中明度 - 読みやすさを確保 */
+    --lightness-secondary: 60%; /* やや明るめ - 補助色として */
+    --lightness-accent: 45%;    /* やや暗め - アクセントとして */
+    --saturation-primary: 70%;  /* 中彩度 - 視認性を確保 */
+    --saturation-secondary: 60%; /* やや低彩度 - 目に優しく */
+    
+    /* HSL色空間での色定義 - 色彩学の原則に従う */
+    --primary-color: hsl(var(--primary-hue), var(--saturation-primary), var(--lightness-primary));
+    --primary-light: hsl(var(--primary-hue), var(--saturation-primary), calc(var(--lightness-primary) + 15%));
+    --primary-dark: hsl(var(--primary-hue), var(--saturation-primary), calc(var(--lightness-primary) - 15%));
+    
+    --secondary-color: hsl(var(--secondary-hue), var(--saturation-secondary), var(--lightness-secondary));
+    --secondary-light: hsl(var(--secondary-hue), var(--saturation-secondary), calc(var(--lightness-secondary) + 15%));
+    --secondary-dark: hsl(var(--secondary-hue), var(--saturation-secondary), calc(var(--lightness-secondary) - 15%));
+    
+    --accent-color: hsl(var(--accent-hue), var(--saturation-primary), var(--lightness-accent));
+    --accent-light: hsl(var(--accent-hue), var(--saturation-primary), calc(var(--lightness-accent) + 15%));
+    --accent-dark: hsl(var(--accent-hue), var(--saturation-primary), calc(var(--lightness-accent) - 15%));
+    
+    --warning-color: hsl(var(--warning-hue), var(--saturation-primary), var(--lightness-primary));
+    --warning-light: hsl(var(--warning-hue), var(--saturation-primary), calc(var(--lightness-primary) + 15%));
+    --warning-dark: hsl(var(--warning-hue), var(--saturation-primary), calc(var(--lightness-primary) - 15%));
+    
+    --error-color: hsl(var(--error-hue), var(--saturation-primary), var(--lightness-primary));
+    --error-light: hsl(var(--error-hue), var(--saturation-primary), calc(var(--lightness-primary) + 15%));
+    --error-dark: hsl(var(--error-hue), var(--saturation-primary), calc(var(--lightness-primary) - 15%));
+    
+    /* ニュートラルカラー - グレースケールの調和 */
+    --neutral-50: hsl(0, 0%, 95%);   /* ほぼ白 */
+    --neutral-100: hsl(0, 0%, 90%);   /* 非常に薄いグレー */
+    --neutral-200: hsl(0, 0%, 80%);   /* 薄いグレー */
+    --neutral-300: hsl(0, 0%, 70%);   /* 明るいグレー */
+    --neutral-400: hsl(0, 0%, 60%);   /* 中程度のグレー */
+    --neutral-500: hsl(0, 0%, 50%);   /* 中間グレー */
+    --neutral-600: hsl(0, 0%, 40%);   /* 暗いグレー */
+    --neutral-700: hsl(0, 0%, 30%);   /* より暗いグレー */
+    --neutral-800: hsl(0, 0%, 20%);   /* 非常に暗いグレー */
+    --neutral-900: hsl(0, 0%, 10%);   /* ほぼ黒 */
+    
+    /* グラデーション - 色彩調和の原則を適用 */
+    --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    --gradient-secondary: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-light) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-light) 100%);
+    --gradient-warning: linear-gradient(135deg, var(--warning-color) 0%, var(--warning-light) 100%);
+    --gradient-error: linear-gradient(135deg, var(--error-color) 0%, var(--error-light) 100%);
+    
+    /* 複合グラデーション - 色相環の調和を活用 */
+    --gradient-primary-secondary: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    --gradient-primary-accent: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    --gradient-accent-secondary: linear-gradient(135deg, var(--accent-color) 0%, var(--secondary-color) 100%);
+    
+    /* 背景グラデーション - 深みのある色調 */
+    --bg-primary: linear-gradient(135deg, var(--neutral-900) 0%, var(--neutral-800) 25%, var(--neutral-700) 50%, var(--neutral-600) 75%, var(--neutral-500) 100%);
+    --bg-secondary: linear-gradient(135deg, var(--neutral-800) 0%, var(--neutral-700) 100%);
+    --bg-glass: rgba(255, 255, 255, 0.05);
+    --bg-glass-hover: rgba(255, 255, 255, 0.08);
+    --bg-card: var(--neutral-800);
+    --bg-card-hover: var(--neutral-700);
+    
+    /* テキストカラー - コントラスト比を考慮 */
+    --text-primary: var(--neutral-50);
+    --text-secondary: var(--neutral-200);
+    --text-muted: var(--neutral-400);
+    --text-accent: var(--primary-light);
+    --text-success: var(--accent-light);
+    --text-warning: var(--warning-light);
+    --text-error: var(--error-light);
+    
+    /* シャドウ - 奥行きと立体感を表現 */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.25);
+    --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.3);
+    --shadow-glow-primary: 0 0 20px rgba(59, 130, 246, 0.3);
+    --shadow-glow-accent: 0 0 20px rgba(34, 197, 94, 0.3);
+    --shadow-glow-warning: 0 0 20px rgba(251, 146, 60, 0.3);
+    --shadow-glow-error: 0 0 20px rgba(239, 68, 68, 0.3);
+    
+    /* ボーダー - 色彩調和を考慮 */
+    --border-radius-xs: 4px;
+    --border-radius-sm: 6px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-xl: 16px;
+    --border-radius-2xl: 24px;
+    --border-primary: 1px solid var(--primary-color);
+    --border-secondary: 1px solid var(--secondary-color);
+    --border-accent: 1px solid var(--accent-color);
+    --border-neutral: 1px solid var(--neutral-600);
+    --border-glass: 1px solid rgba(255, 255, 255, 0.1);
+    
+    /* スペーシング - 黄金比を考慮 */
+    --spacing-xs: 0.25rem;    /* 4px */
+    --spacing-sm: 0.5rem;     /* 8px */
+    --spacing-md: 1rem;       /* 16px */
+    --spacing-lg: 1.5rem;     /* 24px */
+    --spacing-xl: 2rem;       /* 32px */
+    --spacing-2xl: 3rem;      /* 48px */
+    --spacing-3xl: 4rem;      /* 64px */
+    
+    /* トランジション - 自然な動きを表現 */
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* フォント - 可読性を重視 */
+    --font-family-primary: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    
+    /* フォントサイズ - 階層的なサイズ設定 */
+    --font-size-xs: 0.75rem;    /* 12px */
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-base: 1rem;     /* 16px */
+    --font-size-lg: 1.125rem;   /* 18px */
+    --font-size-xl: 1.25rem;    /* 20px */
+    --font-size-2xl: 1.5rem;    /* 24px */
+    --font-size-3xl: 1.875rem;  /* 30px */
+    --font-size-4xl: 2.25rem;   /* 36px */
+    --font-size-5xl: 3rem;      /* 48px */
+}
+
+/* ===== グローバルスタイル ===== */
+* {
+    box-sizing: border-box;
+}
+
+.main { 
+    padding: 0 !important; 
+}
+
+.stApp { 
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-family: var(--font-family-primary);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.6;
+    font-size: var(--font-size-base);
+}
+
+/* ===== カスタムスクロールバー ===== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--neutral-800);
+    border-radius: var(--border-radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gradient-primary);
+    border-radius: var(--border-radius-sm);
+    transition: var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gradient-secondary);
+}
+
+/* ===== メインヘッダー - 色彩調和を重視 ===== */
+.main-header { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    padding: var(--spacing-3xl);
+    border-radius: var(--border-radius-2xl);
+    margin-bottom: var(--spacing-2xl);
+    text-align: center;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-xl), var(--shadow-glow-primary);
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition-normal);
+}
+
+.main-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--gradient-primary);
+    opacity: 0.1;
+    transition: left 0.8s ease;
+}
+
+.main-header:hover::before {
+    left: 100%;
+}
+
+.main-header:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl), var(--shadow-glow-accent);
+}
+
+.main-header h1 { 
+    margin: 0;
+    font-size: clamp(var(--font-size-3xl), 5vw, var(--font-size-5xl));
+    font-weight: var(--font-weight-extrabold);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.main-header p { 
+    margin: var(--spacing-sm) 0 0 0;
+    font-size: clamp(var(--font-size-lg), 2.5vw, var(--font-size-2xl));
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-light);
+    letter-spacing: 0.01em;
+}
+
+/* ===== サイドバー - 色彩調和を考慮 ===== */
+.css-1d391kg { 
+    background: var(--bg-secondary);
+    backdrop-filter: blur(20px);
+    border-right: var(--border-glass);
+}
+
+.sidebar-header { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+    color: var(--text-primary);
+    border: var(--border-glass);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-normal);
+}
+
+.sidebar-header:hover {
+    background: var(--bg-card-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ===== カードスタイル - 色彩心理学を活用 ===== */
+.metric-card { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-primary);
+    text-align: center;
+    margin: var(--spacing-md) 0;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+    transform: scaleX(0);
+    transition: transform var(--transition-normal);
+}
+
+.metric-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+    background: var(--bg-card-hover);
+}
+
+.metric-card:hover::before {
+    transform: scaleX(1);
+}
+
+.metric-card h3 {
+    margin: 0 0 var(--spacing-sm) 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+}
+
+.metric-card p {
+    margin: 0;
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ===== ステータスカード - 色彩心理学を活用 ===== */
+.success-card { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-accent);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-primary);
+    text-align: center;
+    margin: var(--spacing-md) 0;
+    box-shadow: var(--shadow-md), var(--shadow-glow-accent);
+    transition: var(--transition-normal);
+}
+
+.success-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-accent);
+}
+
+.warning-card { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-secondary);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-primary);
+    text-align: center;
+    margin: var(--spacing-md) 0;
+    box-shadow: var(--shadow-md), var(--shadow-glow-warning);
+    transition: var(--transition-normal);
+}
+
+.warning-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-warning);
+}
+
+.error-card { 
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-primary);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-primary);
+    text-align: center;
+    margin: var(--spacing-md) 0;
+    box-shadow: var(--shadow-md), var(--shadow-glow-error);
+    transition: var(--transition-normal);
+}
+
+.error-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-error);
+}
+
+/* ===== タブスタイル - 色彩調和を重視 ===== */
+.stTabs [data-baseweb="tab-list"] { 
+    gap: var(--spacing-sm);
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-sm);
+    border: var(--border-glass);
+    box-shadow: var(--shadow-sm);
+}
+
+.stTabs [data-baseweb="tab"] { 
+    height: auto;
+    min-height: 48px;
+    white-space: pre-wrap;
+    background: transparent;
+    border-radius: var(--border-radius-md);
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    transition: all var(--transition-normal);
+    font-weight: var(--font-weight-medium);
+    font-size: clamp(var(--font-size-sm), 2vw, var(--font-size-base));
+    color: var(--text-secondary);
+    position: relative;
+    overflow: hidden;
+}
+
+.stTabs [data-baseweb="tab"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    border-radius: var(--border-radius-md);
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    color: var(--text-primary);
+    transform: translateY(-2px);
+}
+
+.stTabs [data-baseweb="tab"]:hover::before {
+    opacity: 0.1;
+}
+
+.stTabs [aria-selected="true"] { 
+    background: var(--gradient-primary);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-md), var(--shadow-glow-primary);
+    transform: translateY(-2px);
+}
+
+.stTabs [aria-selected="true"]::before {
+    opacity: 0;
+}
+
+/* ===== ボタンスタイル - 色彩心理学を活用 ===== */
+.stButton > button { 
+    width: 100%;
+    border-radius: var(--border-radius-xl);
+    border: none;
+    background: var(--gradient-primary);
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    font-size: clamp(var(--font-size-sm), 2vw, var(--font-size-base));
+    min-height: 48px;
+    letter-spacing: 0.01em;
+}
+
+.stButton > button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.stButton > button:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+    background: var(--gradient-secondary);
+}
+
+.stButton > button:hover::before {
+    left: 100%;
+}
+
+.stButton > button:active {
+    transform: translateY(-1px);
+}
+
+/* ===== フォーム要素 - 色彩調和を考慮 ===== */
+.stSelectbox > div > div {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    border-radius: var(--border-radius-md);
+    color: var(--text-primary);
+    transition: var(--transition-normal);
+}
+
+.stSelectbox > div > div:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--primary-color);
+}
+
+.stSlider > div > div {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-sm);
+}
+
+.stSlider .stSlider > div > div > div {
+    background: var(--gradient-primary);
+}
+
+.stNumberInput > div > div > input,
+.stTextInput > div > div > input {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    border-radius: var(--border-radius-md);
+    color: var(--text-primary);
+    transition: var(--transition-normal);
+}
+
+.stNumberInput > div > div > input:focus,
+.stTextInput > div > div > input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* ===== データフレームとプロット - 色彩調和 ===== */
+.stDataFrame {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.plotly {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: var(--border-glass);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+/* ===== アクセシビリティ改善 ===== */
+.stButton > button:focus {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.metric-card:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-lg), 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.stTabs [data-baseweb="tab"]:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 1px;
+}
+
+/* ===== 高コントラストモード対応 ===== */
+@media (prefers-contrast: high) {
+    .main-header {
+        background: var(--neutral-900);
+        border: 2px solid var(--neutral-50);
+    }
+    
+    .metric-card {
+        background: var(--neutral-900);
+        border: 2px solid var(--neutral-50);
+    }
+    
+    .stButton > button {
+        background: var(--neutral-900);
+        border: 2px solid var(--neutral-50);
+    }
+}
+
+/* ===== モーション軽減設定 ===== */
+@media (prefers-reduced-motion: reduce) {
+    .main-header::before,
+    .metric-card::before,
+    .stButton > button::before {
+        transition: none;
+    }
+    
+    .metric-card:hover,
+    .stButton > button:hover,
+    .stTabs [data-baseweb="tab"]:hover {
+        transform: none;
+    }
+}
+
+/* ===== レスポンシブブレークポイント ===== */
+
+/* モバイル (768px以下) */
+@media (max-width: 768px) {
+    .main-header {
+        padding: var(--spacing-xl);
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .main-header h1 {
+        font-size: var(--font-size-3xl);
+    }
+    
+    .main-header p {
+        font-size: var(--font-size-lg);
+    }
+    
+    .metric-card {
+        margin: var(--spacing-sm) 0;
+        padding: var(--spacing-md);
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 44px;
+        font-size: var(--font-size-sm);
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    .stButton > button {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-sm);
+        min-height: 44px;
+    }
+    
+    .sidebar-header {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+}
+
+/* タブレット (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .main-header {
+        padding: var(--spacing-2xl);
+    }
+    
+    .main-header h1 {
+        font-size: var(--font-size-4xl);
+    }
+    
+    .main-header p {
+        font-size: var(--font-size-xl);
+    }
+    
+    .metric-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 52px;
+        font-size: var(--font-size-base);
+    }
+}
+
+/* デスクトップ (1025px以上) */
+@media (min-width: 1025px) {
+    .main-header {
+        padding: var(--spacing-3xl);
+    }
+    
+    .main-header h1 {
+        font-size: var(--font-size-5xl);
+    }
+    
+    .main-header p {
+        font-size: var(--font-size-2xl);
+    }
+}
+
+/* ===== ダークモード対応 ===== */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-primary: var(--neutral-50);
+        --text-secondary: var(--neutral-200);
+        --text-muted: var(--neutral-400);
+        --bg-glass: rgba(255, 255, 255, 0.05);
+        --bg-glass-hover: rgba(255, 255, 255, 0.08);
+    }
+}
+
+/* ===== ライトモード対応 ===== */
+@media (prefers-color-scheme: light) {
+    :root {
+        --text-primary: var(--neutral-900);
+        --text-secondary: var(--neutral-700);
+        --text-muted: var(--neutral-500);
+        --bg-glass: rgba(0, 0, 0, 0.05);
+        --bg-glass-hover: rgba(0, 0, 0, 0.08);
+        --border-glass: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .stApp {
+        background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+        color: var(--text-primary);
+    }
+    
+    .main-header {
+        background: var(--bg-card);
+        border: var(--border-glass);
+        color: var(--text-primary);
+    }
+    
+    .metric-card {
+        background: var(--bg-card);
+        border: var(--border-glass);
+        color: var(--text-primary);
+    }
+}
+
+/* ===== 印刷対応 ===== */
+@media print {
+    .main-header {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+        box-shadow: none !important;
+    }
+    
+    .metric-card {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+        box-shadow: none !important;
+    }
+    
+    .stButton > button {
+        background: black !important;
+        color: white !important;
+        border: 1px solid black !important;
+    }
+}
+
+/* ===== カスタムアニメーション - 自然な動き ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: var(--shadow-md);
+    }
+    50% {
+        box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+    }
+}
+
+/* アニメーション適用 */
+.metric-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.sidebar-header {
+    animation: slideInLeft 0.6s ease-out;
+}
+
+.main-header {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+/* ===== ローディングアニメーション ===== */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--neutral-600);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s ease-in-out infinite;
+}
+
+/* ===== ツールチップスタイル ===== */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: var(--neutral-800);
+    color: var(--text-primary);
+    text-align: center;
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-sm);
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    font-size: var(--font-size-sm);
+    border: var(--border-glass);
+    box-shadow: var(--shadow-md);
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* ===== 色彩学に基づく特別なスタイル ===== */
+
+/* 成功状態 - 緑系の色彩心理学 */
+.success-state {
+    color: var(--accent-color);
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+    border: 1px solid var(--accent-color);
+}
+
+/* 警告状態 - 黄系の色彩心理学 */
+.warning-state {
+    color: var(--warning-color);
+    background: linear-gradient(135deg, rgba(251, 146, 60, 0.1) 0%, rgba(251, 146, 60, 0.05) 100%);
+    border: 1px solid var(--warning-color);
+}
+
+/* エラー状態 - 赤系の色彩心理学 */
+.error-state {
+    color: var(--error-color);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+    border: 1px solid var(--error-color);
+}
+
+/* 情報状態 - 青系の色彩心理学 */
+.info-state {
+    color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+    border: 1px solid var(--primary-color);
+}
+
+/* ===== 色彩調和のためのユーティリティクラス ===== */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-accent { color: var(--text-accent); }
+.text-success { color: var(--text-success); }
+.text-warning { color: var(--text-warning); }
+.text-error { color: var(--text-error); }
+
+.bg-primary { background: var(--primary-color); }
+.bg-secondary { background: var(--secondary-color); }
+.bg-accent { background: var(--accent-color); }
+.bg-warning { background: var(--warning-color); }
+.bg-error { background: var(--error-color); }
+
+.border-primary { border-color: var(--primary-color); }
+.border-secondary { border-color: var(--secondary-color); }
+.border-accent { border-color: var(--accent-color); }
+.border-warning { border-color: var(--warning-color); }
+.border-error { border-color: var(--error-color); }
+
+.shadow-primary { box-shadow: var(--shadow-glow-primary); }
+.shadow-accent { box-shadow: var(--shadow-glow-accent); }
+.shadow-warning { box-shadow: var(--shadow-glow-warning); }
+.shadow-error { box-shadow: var(--shadow-glow-error); }
