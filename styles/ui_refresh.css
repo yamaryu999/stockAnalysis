@@ -1,21 +1,22 @@
 /* Modern UI refresh for the Japan Stock Analysis tool */
 :root {
-  --brand-primary: #1f3ae0;
-  --brand-primary-dark: #142499;
-  --brand-primary-light: #314eff;
-  --brand-accent: #00c897;
-  --brand-surface: #0f111a;
-  --brand-surface-alt: #161927;
+  --brand-primary: #e50914;
+  --brand-primary-dark: #b0060f;
+  --brand-primary-light: #ff1b2d;
+  --brand-accent: #f5c518;
+  --brand-surface: #141414;
+  --brand-surface-alt: #1f1f1f;
+  --brand-surface-elevated: #242424;
   --brand-border: rgba(255, 255, 255, 0.08);
-  --brand-text: rgba(255, 255, 255, 0.88);
-  --brand-text-muted: rgba(255, 255, 255, 0.6);
-  --brand-shadow: 0 18px 40px rgba(17, 21, 45, 0.45);
+  --brand-text: rgba(255, 255, 255, 0.9);
+  --brand-text-muted: rgba(255, 255, 255, 0.62);
+  --brand-shadow: 0 18px 42px rgba(10, 10, 10, 0.55);
 }
 
 div[data-testid="stAppViewContainer"] {
-  background: radial-gradient(circle at 0% 0%, rgba(38, 53, 255, 0.35), transparent 55%),
-              radial-gradient(circle at 100% 0%, rgba(0, 200, 151, 0.28), transparent 45%),
-              var(--brand-surface);
+  background: radial-gradient(circle at 20% -10%, rgba(229, 9, 20, 0.35), transparent 50%),
+              radial-gradient(circle at 90% 0%, rgba(245, 197, 24, 0.18), transparent 45%),
+              linear-gradient(160deg, #0d0d0d 0%, #111 45%, #141414 100%);
 }
 
 div[data-testid="stSidebar"] {
@@ -28,7 +29,7 @@ div[data-testid="stSidebar"] {
 {
   border-radius: 24px;
   padding: 32px;
-  background: linear-gradient(135deg, rgba(31, 58, 224, 0.85), rgba(20, 36, 153, 0.9));
+  background: linear-gradient(135deg, rgba(229, 9, 20, 0.92), rgba(46, 11, 16, 0.95));
   color: white;
   box-shadow: var(--brand-shadow);
   margin-bottom: 28px;
@@ -61,35 +62,35 @@ div[data-testid="stSidebar"] {
 
 .action-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 18px;
-  margin-bottom: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
 }
 
 .action-card {
   position: relative;
-  padding: 22px 24px;
+  padding: 26px 28px;
   border-radius: 20px;
-  background: var(--brand-surface-alt);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 12px 30px rgba(10, 12, 22, 0.35);
+  background: linear-gradient(160deg, rgba(31, 31, 31, 0.9), rgba(24, 24, 24, 0.85));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45);
   color: var(--brand-text);
   transition: transform 0.25s ease, border-color 0.25s ease;
 }
 
 .action-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-6px);
+  border-color: rgba(229, 9, 20, 0.35);
 }
 
 .action-card h4 {
-  margin: 0 0 6px 0;
-  font-size: 1.05rem;
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
   font-weight: 600;
 }
 
 .action-card p {
-  margin: 0 0 18px 0;
+  margin: 0 0 22px 0;
   color: var(--brand-text-muted);
   font-size: 0.92rem;
 }
@@ -97,14 +98,15 @@ div[data-testid="stSidebar"] {
 .action-card button[data-testid="stBaseButton"] {
   width: 100%;
   justify-content: center;
-  border-radius: 14px !important;
+  border-radius: 16px !important;
   border: none;
-  padding: 12px 18px;
-  font-size: 1rem;
+  padding: 14px 20px;
+  font-size: 1.05rem;
   font-weight: 600;
   background: var(--brand-primary);
   color: white;
-  box-shadow: 0 12px 24px rgba(31, 58, 224, 0.35);
+  box-shadow: 0 14px 32px rgba(229, 9, 20, 0.4);
+  min-height: 52px;
 }
 
 .action-card button[data-testid="stBaseButton"]:hover {
@@ -115,7 +117,7 @@ div[data-testid="stSidebar"] {
   margin-top: 12px;
   padding: 24px;
   border-radius: 24px;
-  background: rgba(17, 20, 33, 0.78);
+  background: linear-gradient(170deg, rgba(26, 26, 26, 0.92), rgba(18, 18, 18, 0.88));
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -136,9 +138,11 @@ div[data-testid="stSidebar"] {
   border-radius: 18px;
   padding: 18px;
   background: linear-gradient(145deg, rgba(31, 58, 224, 0.12), rgba(31, 58, 224, 0.04));
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: linear-gradient(160deg, rgba(229, 9, 20, 0.18), rgba(229, 9, 20, 0.05));
+  border: 1px solid rgba(229, 9, 20, 0.22);
   color: var(--brand-text);
-  box-shadow: 0 14px 28px rgba(10, 12, 22, 0.35);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.4);
 }
 
 .metric-card strong {
@@ -152,6 +156,13 @@ div[data-testid="stSidebar"] {
   font-size: 1.6rem;
   font-weight: 700;
   margin-top: 4px;
+}
+
+.metric-card small {
+  display: block;
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.8rem;
 }
 
 .recommendation-grid {
@@ -211,10 +222,38 @@ div[data-testid="stSidebar"] {
 .market-chip {
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(0, 200, 151, 0.12);
-  border: 1px solid rgba(0, 200, 151, 0.22);
-  color: #54ffd4;
+  background: rgba(229, 9, 20, 0.2);
+  border: 1px solid rgba(229, 9, 20, 0.35);
+  color: #ff8087;
   font-size: 0.85rem;
+}
+
+.event-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.event-chip {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(229, 9, 20, 0.18);
+  border: 1px solid rgba(229, 9, 20, 0.28);
+  color: #ffb3b8;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+}
+
+.headline-list {
+  margin: 12px 0 0 0;
+  padding-left: 18px;
+  color: var(--brand-text-muted);
+  font-size: 0.9rem;
+}
+
+.headline-list li {
+  margin-bottom: 6px;
 }
 
 @media (max-width: 768px) {
@@ -227,4 +266,58 @@ div[data-testid="stSidebar"] {
   .summary-block {
     padding: 18px;
   }
+}
+
+.stButton > button {
+  background: var(--brand-primary);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-weight: 600;
+  padding: 12px 22px;
+  box-shadow: 0 12px 28px rgba(229, 9, 20, 0.35);
+  min-height: 48px;
+  font-size: 1rem;
+}
+
+.stButton > button:hover {
+  background: var(--brand-primary-light);
+}
+
+.stRadio > div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stRadio label {
+  background: linear-gradient(120deg, rgba(26, 26, 26, 0.94), rgba(20, 20, 20, 0.9));
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 14px 16px;
+  color: var(--brand-text);
+  font-weight: 600;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.stRadio label:hover {
+  transform: translateX(4px);
+  border-color: rgba(229, 9, 20, 0.35);
+}
+
+.stRadio label[data-baseweb="radio"] > div:first-child {
+  margin-right: 12px;
+}
+
+.stRadio input:checked + div + div {
+  background: rgba(229, 9, 20, 0.18);
+  border-radius: 10px;
+}
+
+.stCheckbox, .stSelectbox, .stTextInput, .stNumberInput {
+  color: var(--brand-text);
+}
+
+.block-container {
+  padding-top: 1.5rem;
 }

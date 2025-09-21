@@ -8,6 +8,20 @@ import numpy as np
 import os
 from pathlib import Path
 
+NAV_ITEMS = [
+    ("🏠 ダッシュボード", "dashboard"),
+    ("⚡ リアルタイム", "realtime"),
+    ("🔍 スクリーニング", "screening"),
+    ("📰 ニュース分析", "news"),
+    ("🤖 AI分析", "ai_analysis"),
+    ("📊 ポートフォリオ", "portfolio"),
+    ("📊 監視", "monitoring"),
+    ("⚙️ 設定", "settings"),
+]
+
+NAV_LABEL_TO_KEY = {label: key for label, key in NAV_ITEMS}
+NAV_KEY_TO_LABEL = {key: label for label, key in NAV_ITEMS}
+
 # 安全なインポート処理
 try:
     # 新しく作成したモジュールをインポート
@@ -52,7 +66,10 @@ try:
     
     # データエクスポート機能をインポート
     from data_export import data_exporter, data_import_manager, ExportConfig
-    
+    from news_analyzer import NewsAnalyzer
+    from services.news_signal_engine import NewsSignalEngine
+    from services.uptrend_selector import UptrendSelector
+
     # 分離された分析ページは削除されたため、ダミー関数を作成
     def render_fundamental_analysis_page():
         st.info("ファンダメンタル分析ページは統合されました")
@@ -82,6 +99,18 @@ except ImportError as e:
     
     class PortfolioAnalyzer:
         def __init__(self):
+            pass
+
+    class NewsAnalyzer:
+        def __init__(self):
+            pass
+
+    class NewsSignalEngine:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    class UptrendSelector:
+        def __init__(self, *args, **kwargs):
             pass
     
     # ダミーのモバイル関数を作成
@@ -508,6 +537,7 @@ def load_improved_styles():
             const pageMap = {
                 'dashboard': '🏠 ダッシュボード',
                 'screening': '🔍 スクリーニング',
+                'news': '📰 ニュース分析',
                 'ai': '🤖 AI分析',
                 'portfolio': '📊 ポートフォリオ',
                 'settings': '⚙️ 設定'
@@ -605,7 +635,45 @@ def load_ui_refresh_styles():
 load_improved_styles()
 load_ui_refresh_styles()
 
+try:
+    database_manager = DatabaseManager()
+except Exception:
+    database_manager = None
+
+try:
+    news_analyzer_service = NewsAnalyzer()
+except Exception:
+    news_analyzer_service = None
+
+try:
+    news_signal_engine = NewsSignalEngine(news_analyzer_service, database_manager)
+except Exception:
+    news_signal_engine = None
+
+try:
+    uptrend_selector = UptrendSelector(news_signal_engine)
+except Exception:
+    uptrend_selector = None
+
 # セッション状態の初期化
+query_params = {}
+try:
+    query_params = dict(st.query_params)
+except Exception:
+    query_params = {}
+
+
+def set_active_page(label: str) -> None:
+    """Update current page label and query parameter."""
+    st.session_state.page_selector = label
+    key = NAV_LABEL_TO_KEY.get(label)
+    if key:
+        try:
+            st.query_params['page'] = key
+        except Exception:
+            pass
+
+
 if 'analysis_results' not in st.session_state:
     st.session_state.analysis_results = None
 if 'is_analyzing' not in st.session_state:
@@ -619,6 +687,194 @@ if 'user_preferences' not in st.session_state:
         'currency': 'JPY',
         'max_results': 50
     }
+if 'show_results' not in st.session_state:
+    st.session_state.show_results = False
+if 'news_symbols_used' not in st.session_state:
+    st.session_state.news_symbols_used = []
+
+initial_page_key = None
+if query_params:
+    page_values = query_params.get('page')
+    if page_values:
+        initial_page_key = page_values[0]
+
+if 'page_selector' not in st.session_state:
+    default_label = NAV_KEY_TO_LABEL.get(initial_page_key, NAV_ITEMS[0][0])
+    st.session_state.page_selector = default_label
+
+
+def perform_quick_analysis():
+    """クイック分析ボタンから呼び出される分析シミュレーション"""
+    import random
+
+    st.session_state.is_analyzing = True
+    with st.spinner("🚀 分析を実行中..."):
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+        steps = [
+            "データを取得中...",
+            "銘柄をスクリーニング中...",
+            "技術指標を計算中...",
+            "AI分析を実行中...",
+            "結果を整理中...",
+        ]
+
+        for step_id, step in enumerate(steps, start=1):
+            status_text.text(f"📊 {step}")
+            progress_bar.progress(step_id / len(steps))
+            time.sleep(1)
+
+        analysis_results = {
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "analyzed_stocks": random.randint(100, 500),
+            "recommendations": [
+                {"symbol": "7203.T", "name": "トヨタ自動車", "score": 85, "trend": "上昇"},
+                {"symbol": "6758.T", "name": "ソニーグループ", "score": 78, "trend": "上昇"},
+                {"symbol": "9984.T", "name": "ソフトバンクグループ", "score": 72, "trend": "横ばい"},
+                {"symbol": "4063.T", "name": "信越化学工業", "score": 88, "trend": "上昇"},
+                {"symbol": "6861.T", "name": "キーエンス", "score": 82, "trend": "上昇"},
+            ],
+            "market_summary": {
+                "overall_trend": "上昇",
+                "volatility": "中程度",
+                "recommended_sectors": ["自動車", "半導体", "化学"],
+            },
+        }
+
+        st.session_state.analysis_results = analysis_results
+        st.session_state.show_results = True
+
+    st.session_state.is_analyzing = False
+    st.success("✅ 分析が完了しました！")
+    st.balloons()
+    st.rerun()
+
+
+def render_dashboard_hero():
+    """トップのヒーローセクションを描画"""
+    st.markdown(
+        """
+        <section class="hero">
+            <span class="hero__badge">AI ✦ Realtime ✦ Multi-source</span>
+            <h1 class="hero__title">日本株データを、美しく分かりやすく。</h1>
+            <p class="hero__subtitle">リアルタイム市場データとAI推奨を横断し、投資判断に必要な情報へ最短距離でアクセス。</p>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_quick_actions():
+    """ダッシュボードのクイックアクションカードを表示"""
+    col1, col2, col3 = st.columns(3, gap="large")
+
+    with col1:
+        st.markdown(
+            """
+            <div class="action-card">
+                <h4>🚀 ワンクリック分析</h4>
+                <p>主要銘柄群を高速にスクリーニングし、推奨候補を即座に提示します。</p>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("🚀 分析実行", help="全銘柄の分析を実行", key="quick_analyze"):
+            perform_quick_analysis()
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with col2:
+        st.markdown(
+            """
+            <div class="action-card">
+                <h4>📊 最新結果を表示</h4>
+                <p>直近の分析サマリーと推奨銘柄をダッシュボードで確認します。</p>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("📊 結果表示", help="分析結果を表示", key="quick_results"):
+            if st.session_state.analysis_results is None:
+                st.warning("⚠️ まず分析を実行してください")
+            else:
+                st.session_state.show_results = True
+                set_active_page("🏠 ダッシュボード")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with col3:
+        st.markdown(
+            """
+            <div class="action-card">
+                <h4>📰 ニュース分析</h4>
+                <p>最新の経済ニュースからセンチメントや注目テーマを把握しましょう。</p>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("📰 ニュースページへ", help="ニュース駆動スコアを確認", key="quick_news"):
+            set_active_page("📰 ニュース分析")
+            st.experimental_rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+
+
+def render_recommendation_cards(recommendations):
+    """推奨銘柄カード群を描画"""
+    if not recommendations:
+        return
+
+    cards_html = "".join(
+        f"""
+        <div class=\"recommendation-card\">
+            <div class=\"recommendation-card__symbol\">{rec.get('symbol', '-')}</div>
+            <div class=\"recommendation-card__name\">{rec.get('name', '---')}</div>
+            <div class=\"recommendation-card__meta\">
+                <span class=\"recommendation-card__score\">スコア {rec.get('score', '--')}</span>
+                <span>{rec.get('trend', '---')}</span>
+            </div>
+        </div>
+        """
+        for rec in recommendations[:4]
+    )
+    st.markdown(f"<div class='recommendation-grid'>{cards_html}</div>", unsafe_allow_html=True)
+
+
+def render_analysis_summary(analysis_results):
+    """クイック分析の結果サマリーを描画"""
+    if not analysis_results:
+        return
+
+    market = analysis_results.get("market_summary", {})
+    sectors = market.get("recommended_sectors", [])
+    chips_html = "".join(f"<span class='market-chip'>{sector}</span>" for sector in sectors)
+
+    summary_html = f"""
+    <section class="summary-block">
+        <div class="summary-block__title">
+            <h3>📊 分析サマリー</h3>
+            <span class="hero__badge">最終更新 {analysis_results.get('timestamp', '-')}</span>
+        </div>
+        <div class="action-grid">
+            <div class="metric-card">
+                <strong>分析銘柄数</strong>
+                <span>{analysis_results.get('analyzed_stocks', '--')} 銘柄</span>
+                <small>AIフィルタ済みユニバース</small>
+            </div>
+            <div class="metric-card">
+                <strong>市場トレンド</strong>
+                <span>{market.get('overall_trend', '---')}</span>
+                <small>マーケット方向感</small>
+            </div>
+            <div class="metric-card">
+                <strong>ボラティリティ</strong>
+                <span>{market.get('volatility', '---')}</span>
+                <small>現在の変動率評価</small>
+            </div>
+            <div class="metric-card">
+                <strong>推奨セクター</strong>
+                <span>{', '.join(sectors) if sectors else '---'}</span>
+                <small>AI推奨セクター</small>
+            </div>
+        </div>
+        <div class="market-chip-group">{chips_html}</div>
+    </section>
+    """
+    st.markdown(summary_html, unsafe_allow_html=True)
 
 # メインヘッダー
 def render_main_header():
@@ -643,339 +899,316 @@ def render_main_header():
 
 # ダッシュボードメトリック
 def render_dashboard_metrics():
-    """色彩学ベースのダッシュボードメトリックのレンダリング"""
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        st.markdown("""
-        <div class="metric-card">
-            <h3>📊 分析銘柄数</h3>
-            <p>1,000+</p>
-            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">東京証券取引所</p>
+    """色彩学ベースのダッシュボードメトリック"""
+    st.markdown(
+        """
+        <div class="action-grid">
+            <div class="metric-card">
+                <strong>📊 分析銘柄数</strong>
+                <span>1,000+</span>
+                <small>東京証券取引所</small>
+            </div>
+            <div class="metric-card">
+                <strong>🤖 AI推奨精度</strong>
+                <span>95%</span>
+                <small>マルチモデル評価</small>
+            </div>
+            <div class="metric-card">
+                <strong>⚡ 平均処理時間</strong>
+                <span>3.2s</span>
+                <small>最新バッチ実績</small>
+            </div>
+            <div class="metric-card">
+                <strong>🔔 発火アラート</strong>
+                <span>12件</span>
+                <small>リアルタイム監視中</small>
+            </div>
         </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("""
-        <div class="metric-card">
-            <h3>🤖 AI推奨</h3>
-            <p>95%</p>
-            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">精度</p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col3:
-        st.markdown("""
-        <div class="metric-card">
-            <h3>⚡ 処理速度</h3>
-            <p>3.2s</p>
-            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">平均</p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col4:
-        st.markdown("""
-        <div class="metric-card">
-            <h3>🔔 アラート</h3>
-            <p>12</p>
-            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">アクティブ</p>
-        </div>
-        """, unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True,
+    )
 
 # サイドバー
 def render_sidebar():
     """高視認性デザインのサイドバーのレンダリング"""
     with st.sidebar:
-        # 高視認性デザインのヘッダー
-        st.markdown("""
-        <div class="sidebar-header">
-            <h2>👁️ ナビゲーション</h2>
-            <p>機能を選択してください</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Netflix風ナビゲーションメニュー
-        st.markdown("""
-        <div class="netflix-nav-menu">
-            <div class="netflix-nav-item" onclick="selectPage('dashboard')">
-                <span class="netflix-nav-icon">🏠</span>
-                <span class="netflix-nav-text">ダッシュボード</span>
+        st.markdown(
+            """
+            <div class="sidebar-header">
+                <h2>メインメニュー</h2>
+                <p>移動したいセクションを選択してください</p>
             </div>
-            <div class="netflix-nav-item" onclick="selectPage('realtime')">
-                <span class="netflix-nav-icon">⚡</span>
-                <span class="netflix-nav-text">リアルタイム</span>
-            </div>
-            <div class="netflix-nav-item" onclick="selectPage('screening')">
-                <span class="netflix-nav-icon">🔍</span>
-                <span class="netflix-nav-text">スクリーニング</span>
-            </div>
-            <div class="netflix-nav-item" onclick="selectPage('ai')">
-                <span class="netflix-nav-icon">🤖</span>
-                <span class="netflix-nav-text">AI分析</span>
-            </div>
-            <div class="netflix-nav-item" onclick="selectPage('portfolio')">
-                <span class="netflix-nav-icon">📊</span>
-                <span class="netflix-nav-text">ポートフォリオ</span>
-            </div>
-            <div class="netflix-nav-item" onclick="selectPage('monitoring')">
-                <span class="netflix-nav-icon">📊</span>
-                <span class="netflix-nav-text">監視</span>
-            </div>
-            <div class="netflix-nav-item" onclick="selectPage('settings')">
-                <span class="netflix-nav-icon">⚙️</span>
-                <span class="netflix-nav-text">設定</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # ページ選択（隠し要素）
-        # デバイス情報を取得
-        screen_size = get_screen_size()
-        is_mobile = is_mobile_device()
-        
-        # モバイル対応ページ選択
-        if is_mobile:
-            page = mobile_components.mobile_navigation([
-                {"name": "🏠 ダッシュボード", "key": "dashboard"},
-                {"name": "⚡ リアルタイム", "key": "realtime"},
-                {"name": "🔍 スクリーニング", "key": "screening"},
-                {"name": "🤖 AI分析", "key": "ai_analysis"},
-                {"name": "📊 ポートフォリオ", "key": "portfolio"},
-                {"name": "📊 監視", "key": "monitoring"},
-                {"name": "⚙️ 設定", "key": "settings"}
-            ])
-        else:
-            page = st.selectbox(
-                "ページを選択",
-                ["🏠 ダッシュボード", "⚡ リアルタイム", "🔍 スクリーニング", "🤖 AI分析", "📊 ポートフォリオ", "📊 監視", "⚙️ 設定"],
-                key="page_selector",
-                help="分析したい機能を選択してください",
-                label_visibility="collapsed"
+            """,
+            unsafe_allow_html=True,
+        )
+
+        labels = [item[0] for item in NAV_ITEMS]
+        current_label = st.session_state.get('page_selector', labels[0])
+
+        if is_mobile_device():
+            selected_label = mobile_components.mobile_navigation(
+                [{"name": label, "key": key} for label, key in NAV_ITEMS],
+                current_page=current_label,
             )
-        
-        # Netflix風クイックアクセス
-        st.markdown("""
-        <div class="netflix-quick-access">
-            <h3>⚡ クイックアクセス</h3>
-            <div class="netflix-quick-buttons">
-                <button class="netflix-quick-btn" onclick="runAnalysis()">🚀 分析実行</button>
-                <button class="netflix-quick-btn" onclick="showResults()">📊 結果表示</button>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # クイックアクセス機能（隠し要素）
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("🚀 分析実行", help="全銘柄の分析を実行", key="quick_analyze"):
-                st.session_state.is_analyzing = True
-                
-                # 分析処理を実行
-                with st.spinner("🚀 分析を実行中..."):
-                    try:
-                        # 分析のシミュレーション（実際の分析処理）
-                        import time
-                        import random
-                        
-                        # 進捗バーを表示
-                        progress_bar = st.progress(0)
-                        status_text = st.empty()
-                        
-                        # 分析ステップをシミュレート
-                        steps = [
-                            "データを取得中...",
-                            "銘柄をスクリーニング中...",
-                            "技術指標を計算中...",
-                            "AI分析を実行中...",
-                            "結果を整理中..."
-                        ]
-                        
-                        for i, step in enumerate(steps):
-                            status_text.text(f"📊 {step}")
-                            progress_bar.progress((i + 1) / len(steps))
-                            time.sleep(1)  # 実際の処理時間をシミュレート
-                        
-                        # 分析結果を生成
-                        analysis_results = {
-                            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
-                            "analyzed_stocks": random.randint(100, 500),
-                            "recommendations": [
-                                {"symbol": "7203.T", "name": "トヨタ自動車", "score": 85, "trend": "上昇"},
-                                {"symbol": "6758.T", "name": "ソニーグループ", "score": 78, "trend": "上昇"},
-                                {"symbol": "9984.T", "name": "ソフトバンクグループ", "score": 72, "trend": "横ばい"},
-                                {"symbol": "4063.T", "name": "信越化学工業", "score": 88, "trend": "上昇"},
-                                {"symbol": "6861.T", "name": "キーエンス", "score": 82, "trend": "上昇"}
-                            ],
-                            "market_summary": {
-                                "overall_trend": "上昇",
-                                "volatility": "中程度",
-                                "recommended_sectors": ["自動車", "半導体", "化学"]
-                            }
-                        }
-                        
-                        # セッション状態に結果を保存
-                        st.session_state.analysis_results = analysis_results
-                        st.session_state.is_analyzing = False
-                        
-                        # 成功メッセージを表示
-                        st.success("✅ 分析が完了しました！")
-                        st.balloons()  # お祝いのアニメーション
-                        
-                    except Exception as e:
-                        st.error(f"❌ 分析中にエラーが発生しました: {e}")
-                        st.session_state.is_analyzing = False
-                
-                st.rerun()
-        
-        with col2:
-            if st.button("📊 結果表示", help="分析結果を表示", key="quick_results"):
-                if st.session_state.analysis_results is not None:
-                    st.success("✅ 分析結果が利用可能です")
-                    
-                    # 分析結果を表示
-                    results = st.session_state.analysis_results
-                    
-                    # サマリー情報
-                    st.markdown("### 📊 分析サマリー")
-                    col_summary1, col_summary2, col_summary3 = st.columns(3)
-                    
-                    with col_summary1:
-                        st.metric("分析銘柄数", f"{results['analyzed_stocks']} 銘柄")
-                    
-                    with col_summary2:
-                        st.metric("分析時刻", results['timestamp'])
-                    
-                    with col_summary3:
-                        st.metric("市場トレンド", results['market_summary']['overall_trend'])
-                    
-                    # 推奨銘柄
-                    st.markdown("### 🎯 推奨銘柄")
-                    for rec in results['recommendations']:
-                        with st.expander(f"📈 {rec['symbol']} - {rec['name']} (スコア: {rec['score']})"):
-                            st.write(f"**トレンド**: {rec['trend']}")
-                            st.write(f"**スコア**: {rec['score']}/100")
-                    
-                    # 市場サマリー
-                    st.markdown("### 📈 市場サマリー")
-                    st.write(f"**全体トレンド**: {results['market_summary']['overall_trend']}")
-                    st.write(f"**ボラティリティ**: {results['market_summary']['volatility']}")
-                    st.write(f"**推奨セクター**: {', '.join(results['market_summary']['recommended_sectors'])}")
-                    
-                else:
-                    st.warning("⚠️ まず分析を実行してください")
-        
-        # Netflix風設定セクション
-        st.markdown("""
-        <div class="netflix-settings">
-            <h3>⚙️ 設定</h3>
-            <div class="netflix-setting-item">
-                <label class="netflix-setting-label">テーマ</label>
-                <select class="netflix-setting-control" id="theme-select">
-                    <option value="dark">ダーク</option>
-                    <option value="light">ライト</option>
-                </select>
-            </div>
-            <div class="netflix-setting-item">
-                <label class="netflix-setting-label">言語</label>
-                <select class="netflix-setting-control" id="language-select">
-                    <option value="ja">日本語</option>
-                    <option value="en">English</option>
-                </select>
-            </div>
-            <div class="netflix-setting-item">
-                <label class="netflix-setting-label">最大結果数</label>
-                <input type="range" class="netflix-setting-control" id="max-results-slider" min="10" max="200" value="50">
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # 設定機能（隠し要素）
-        # テーマ選択
+        else:
+            try:
+                default_index = labels.index(current_label)
+            except ValueError:
+                default_index = 0
+            selected_label = st.radio(
+                "ナビゲーション",
+                labels,
+                index=default_index,
+                label_visibility="collapsed",
+            )
+
+        if selected_label != current_label:
+            set_active_page(selected_label)
+
+        st.divider()
+        st.markdown("### クイックアクセス")
+        quick_col1, quick_col2 = st.columns(2)
+        with quick_col1:
+            if st.button("🚀 ダッシュボード", key="sidebar_quick_dashboard"):
+                set_active_page("🏠 ダッシュボード")
+                st.experimental_rerun()
+        with quick_col2:
+            if st.button("📰 ニュース", key="sidebar_quick_news"):
+                set_active_page("📰 ニュース分析")
+                st.experimental_rerun()
+
+        st.divider()
+        st.markdown("### 表示設定")
+
         theme = st.selectbox(
             "テーマ",
             ["dark", "light"],
             index=0 if st.session_state.user_preferences['theme'] == 'dark' else 1,
-            help="アプリケーションのテーマを選択",
             key="theme_selector",
-            label_visibility="collapsed"
         )
         st.session_state.user_preferences['theme'] = theme
-        
-        # 言語選択
+
         language = st.selectbox(
             "言語",
             ["ja", "en"],
             index=0 if st.session_state.user_preferences['language'] == 'ja' else 1,
-            help="表示言語を選択",
             key="language_selector",
-            label_visibility="collapsed"
         )
         st.session_state.user_preferences['language'] = language
-        
-        # 最大結果数
+
         max_results = st.slider(
             "最大結果数",
             min_value=10,
             max_value=200,
             value=st.session_state.user_preferences['max_results'],
             step=10,
-            help="表示する最大結果数を設定",
             key="max_results_selector",
-            label_visibility="collapsed"
         )
         st.session_state.user_preferences['max_results'] = max_results
 
 # ダッシュボードページ
 def render_dashboard_page():
     """ダッシュボードページのレンダリング"""
-    st.markdown("## 🏠 ダッシュボード")
-    
-    # メトリック表示
+    render_dashboard_hero()
+    render_quick_actions()
     render_dashboard_metrics()
-    
-    st.markdown("---")
-    
+
+    if st.session_state.show_results and st.session_state.analysis_results:
+        analysis_results = st.session_state.analysis_results
+        render_analysis_summary(analysis_results)
+        render_recommendation_cards(analysis_results.get('recommendations', []))
+
     # 市場概要チャート
-    st.markdown("### 📈 市場概要")
-    
-    # サンプルデータでチャートを作成
-    market_data = pd.DataFrame({
-        'セクター': ['技術', '金融', '製造業', 'サービス', 'エネルギー'],
-        'パフォーマンス': [12.5, 8.3, 15.2, 6.7, 9.8],
-        '銘柄数': [150, 120, 200, 180, 80]
-    })
-    
+    market_data = pd.DataFrame(
+        {
+            'セクター': ['技術', '金融', '製造業', 'サービス', 'エネルギー'],
+            'パフォーマンス': [12.5, 8.3, 15.2, 6.7, 9.8],
+            '銘柄数': [150, 120, 200, 180, 80],
+        }
+    )
+
+    st.markdown("<section class='summary-block'>", unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="summary-block__title">
+            <h3>📈 市場サマリー</h3>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     col1, col2 = st.columns(2)
-    
     with col1:
         fig_performance = px.bar(
-            market_data, 
-            x='セクター', 
+            market_data,
+            x='セクター',
             y='パフォーマンス',
             title='セクター別パフォーマンス (%)',
             color='パフォーマンス',
-            color_continuous_scale='Viridis'
+            color_continuous_scale='Blues',
         )
         fig_performance.update_layout(
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
-            font_color='white'
+            font_color='white',
         )
-        st.plotly_chart(fig_performance, width='stretch')
-    
+        st.plotly_chart(fig_performance, use_container_width=True)
+
     with col2:
         fig_count = px.pie(
-            market_data, 
-            values='銘柄数', 
+            market_data,
+            values='銘柄数',
             names='セクター',
-            title='セクター別銘柄数'
+            title='セクター別銘柄数',
         )
         fig_count.update_layout(
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
-            font_color='white'
+            font_color='white',
         )
-        st.plotly_chart(fig_count, width='stretch')
+    st.plotly_chart(fig_count, use_container_width=True)
+
+    st.markdown("</section>", unsafe_allow_html=True)
+
+
+def render_news_insights_page():
+    """ニュースベースの銘柄スクリーニングを表示"""
+    st.markdown("## 📰 ニュース駆動スクリーニング")
+    # MCP 用の描画完了マーカー（安定待機のため）
+    st.markdown("<div data-testid='news-view-ready'></div>", unsafe_allow_html=True)
+
+    if not news_signal_engine or not hasattr(news_signal_engine, 'generate_news_signals'):
+        st.info("ニュース分析モジュールを利用できません。依存モジュールのインストール状況を確認してください。")
+        return
+
+    default_symbols = ""
+    symbols_text = st.text_input(
+        "対象銘柄",
+        value=default_symbols,
+        placeholder="未入力の場合は最新ニュースから自動抽出",
+        help="カンマ区切りで証券コードを指定 (例: 7203.T,6758.T)。空欄なら自動抽出",
+    )
+    lookback = st.slider("ニュース対象期間 (日)", 1, 14, 3, 1)
+    min_confidence = st.slider("最低センチメント信頼度", 0.0, 1.0, 0.2, 0.05)
+
+    trigger_generate = False
+    if st.button("ニューススコアを生成", type="primary", key="generate_news_scores"):
+        trigger_generate = True
+
+    # URLパラメータで自動生成を許可（例: ?page=news&autogen=1）
+    try:
+        autogen_param = query_params.get('autogen', ['0'])[0]
+    except Exception:
+        autogen_param = '0'
+    if autogen_param in ('1', 'true', 'yes') and not st.session_state.get('news_autogen_done'):
+        trigger_generate = True
+        st.session_state['news_autogen_done'] = True
+
+    if trigger_generate:
+        raw_symbols = [s.strip().upper() for s in symbols_text.split(',') if s.strip()]
+        effective_symbols = raw_symbols
+        if not effective_symbols:
+            effective_symbols = news_signal_engine.discover_trending_symbols(  # type: ignore
+                top_n=20,
+                lookback_days=lookback,
+            )
+
+        with st.spinner("ニュースを解析しています..."):
+            try:
+                signals = news_signal_engine.generate_news_signals(  # type: ignore
+                    effective_symbols,
+                    lookback_days=lookback,
+                    min_confidence=min_confidence,
+                )
+            except Exception as e:  # noqa: BLE001
+                st.error(f"ニュース解析でエラーが発生しました: {e}")
+                signals = []
+
+        if not signals:
+            st.warning("最新ニュースから候補が見つかりませんでした。期間を延ばすかキーワードを調整してください。")
+            st.session_state['news_signals'] = []
+            st.session_state['news_symbols_used'] = []
+        else:
+            st.session_state['news_signals'] = signals
+            st.session_state['news_symbols_used'] = effective_symbols
+
+    signals = st.session_state.get('news_signals')
+    if not signals:
+        st.info("ニュース分析結果はまだありません。『ニューススコアを生成』を押すと最新ニュースから自動抽出します。")
+        return
+    used_symbols = st.session_state.get('news_symbols_used')
+    if used_symbols:
+        st.caption(f"分析対象: {', '.join(used_symbols[:10])}")
+
+    df = pd.DataFrame(signals)
+    df_display = df[
+        [
+            'symbol',
+            'composite_score',
+            'news_sentiment',
+            'news_intensity',
+            'news_momentum',
+            'fundamental_tilt',
+            'confidence',
+            'news_count',
+        ]
+    ].copy()
+    df_display.rename(columns={'symbol': '銘柄', 'composite_score': '総合スコア'}, inplace=True)
+    st.dataframe(df_display, use_container_width=True)
+
+    candidates = []
+    if uptrend_selector and hasattr(uptrend_selector, 'rank_from_signals'):
+        try:
+            candidates = uptrend_selector.rank_from_signals(signals, top_n=5)
+        except Exception as e:  # noqa: BLE001
+            st.error(f"上昇候補の計算に失敗しました: {e}")
+
+    if candidates:
+        st.markdown("### 📈 上昇ポテンシャル候補")
+        grid_html = []
+        for cand in candidates:
+            tags = ''.join(f"<span class='event-chip'>{tag}</span>" for tag in cand.get('event_tags', [])[:3])
+            headline = cand.get('headlines', [''])[0]
+            grid_html.append(
+                f"""
+                <div class='recommendation-card'>
+                    <div class='recommendation-card__symbol'>{cand['symbol']}</div>
+                    <div class='recommendation-card__meta'>
+                        <span class='recommendation-card__score'>総合 {cand['final_score']:.1f}</span>
+                        <span>5日変化 {cand['price_change_pct']:.1f}%</span>
+                    </div>
+                    <div class='recommendation-card__meta'>
+                        <span>ニュース {cand['news_score']:.1f}</span>
+                        <span>モメンタム {cand['momentum_score']:.1f}</span>
+                    </div>
+                    <div class='event-chip-group'>{tags}</div>
+                    <p class='recommendation-card__name'>{headline}</p>
+                </div>
+                """
+            )
+        st.markdown(f"<div class='recommendation-grid'>{''.join(grid_html)}</div>", unsafe_allow_html=True)
+
+    st.markdown("### 🔎 ハイライト")
+    for signal in signals[: min(5, len(signals))]:
+        header = f"{signal['symbol']}｜総合スコア {signal['composite_score']:.1f}" if signal.get('symbol') else "シグナル詳細"
+        with st.expander(header):
+            st.write(
+                f"**センチメント:** {signal['news_sentiment']:.2f}  /  **ニュース勢い:** {signal['news_momentum']:.2f}  /  **ファンダ傾向:** {signal['fundamental_tilt']:.2f}"
+            )
+
+            keywords = ", ".join(signal.get('top_keywords', []))
+            if keywords:
+                st.write(f"キーワード: {keywords}")
+
+            event_tags = signal.get('event_tags', [])
+            if event_tags:
+                chips = ''.join(f"<span class='event-chip'>{tag}</span>" for tag in event_tags)
+                st.markdown(f"<div class='event-chip-group'>{chips}</div>", unsafe_allow_html=True)
+
+            headlines = signal.get('headlines', [])
+            if headlines:
+                items = ''.join(f"<li>{headline}</li>" for headline in headlines)
+                st.markdown(f"<ul class='headline-list'>{items}</ul>", unsafe_allow_html=True)
 
 # スクリーニングページ
 def render_screening_page():
@@ -2954,9 +3187,6 @@ def render_settings_page():
 def main():
     """メインアプリケーション"""
     try:
-        # メインヘッダー
-        render_main_header()
-        
         # サイドバー
         render_sidebar()
         
@@ -2970,6 +3200,8 @@ def main():
                 render_realtime_page()
             elif page == "🔍 スクリーニング":
                 render_screening_page()
+            elif page == "📰 ニュース分析":
+                render_news_insights_page()
             elif page == "🤖 AI分析":
                 render_ai_analysis_page()
             elif page == "📊 ポートフォリオ":

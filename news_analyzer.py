@@ -48,25 +48,36 @@ class NewsAnalyzer:
                 news_data = self._fetch_comprehensive_news(symbol, days_back)
                 
                 if news_data:
+                    # 新しい順にソート
+                    sorted_news = sorted(
+                        news_data,
+                        key=lambda item: item.get('published', 0) or 0,
+                        reverse=True
+                    )
+                    top_headlines = [item.get('title', '') for item in sorted_news[:5]]
+                    
                     # センチメント分析
-                    sentiment_analysis = self._analyze_sentiment(news_data)
+                    sentiment_analysis = self._analyze_sentiment(sorted_news)
                     
                     # キーワード分析
-                    keyword_analysis = self._analyze_keywords(news_data)
+                    keyword_analysis = self._analyze_keywords(sorted_news)
                     
                     # セクター分析
-                    sector_analysis = self._analyze_sector_impact(symbol, news_data)
+                    sector_analysis = self._analyze_sector_impact(symbol, sorted_news)
                     
                     # 信頼度評価
-                    confidence = self._calculate_news_confidence(news_data)
+                    confidence = self._calculate_news_confidence(sorted_news)
                     
                     results[symbol] = {
                         'sentiment': sentiment_analysis,
                         'keywords': keyword_analysis,
                         'sector_impact': sector_analysis,
                         'confidence': confidence,
-                        'news_count': len(news_data),
-                        'sources': list(set([item['source'] for item in news_data]))
+                        'news_count': len(sorted_news),
+                        'sources': list({item.get('source') for item in sorted_news if item.get('source')}),
+                        'articles': sorted_news,
+                        'top_headlines': top_headlines,
+                        'latest_timestamp': sorted_news[0].get('published') if sorted_news else None
                     }
             
             return results
@@ -136,6 +147,48 @@ class NewsAnalyzer:
         except Exception as e:
             print(f"経済指標取得エラー: {e}")
             return {}
+
+    def discover_trending_symbols(
+        self,
+        candidates: Optional[List[str]] = None,
+        *,
+        days_back: int = 3,
+        top_n: int = 10,
+    ) -> List[str]:
+        """ニュース件数とセンチメントから注目銘柄を抽出"""
+        try:
+            if candidates is None:
+                try:
+                    from stock_analyzer import JapaneseStockAnalyzer  # noqa: WPS433
+
+                    analyzer = JapaneseStockAnalyzer()
+                    candidates = analyzer.get_high_priority_stocks()
+                except Exception:
+                    candidates = []
+
+            trending = []
+            for symbol in candidates[:50]:
+                news_items = self._fetch_comprehensive_news(symbol, days_back)
+                if not news_items:
+                    continue
+                sentiment = self._analyze_sentiment(news_items)
+                trending.append(
+                    {
+                        'symbol': symbol,
+                        'news_count': len(news_items),
+                        'sentiment_score': float(sentiment.get('score', 0.0)),
+                    }
+                )
+
+            trending.sort(
+                key=lambda item: (item['news_count'], item['sentiment_score']),
+                reverse=True,
+            )
+            return [item['symbol'] for item in trending[:top_n]]
+
+        except Exception as e:
+            print(f"トレンド銘柄抽出エラー: {e}")
+            return []
     
     def _fetch_comprehensive_news(self, symbol: str, days_back: int) -> List[Dict]:
         """包括的なニュース取得"""
