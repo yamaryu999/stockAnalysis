@@ -31,6 +31,14 @@ class MarketData:
     volume: int
     timestamp: datetime
     market_status: str
+    bid: Optional[float] = None
+    ask: Optional[float] = None
+    high: Optional[float] = None
+    low: Optional[float] = None
+    vwap: Optional[float] = None
+    volatility: Optional[float] = None
+    momentum: Optional[float] = None
+    volume_ratio: Optional[float] = None
 
 @dataclass
 class Alert:
@@ -219,26 +227,108 @@ class RealTimeDataManager:
             if hist.empty:
                 return None
             
-            current_price = hist['Close'].iloc[-1]
+            current_price = float(hist['Close'].iloc[-1])
             prev_close = info.get('previousClose', current_price)
             
-            change = current_price - prev_close
-            change_percent = (change / prev_close) * 100 if prev_close > 0 else 0
+            change = float(current_price - prev_close)
+            change_percent = (change / prev_close) * 100 if prev_close and prev_close > 0 else 0.0
+
+            volume_series = hist['Volume'] if 'Volume' in hist.columns else pd.Series(dtype=float)
+            last_volume = int(volume_series.iloc[-1]) if not volume_series.empty else 0
+
+            high = float(hist['High'].iloc[-1]) if 'High' in hist.columns else None
+            low = float(hist['Low'].iloc[-1]) if 'Low' in hist.columns else None
+            bid = info.get('bid')
+            ask = info.get('ask')
+
+            recent_hist = hist.tail(30)
+            vwap = self._calculate_vwap(recent_hist) if not recent_hist.empty else None
+            volatility = self._calculate_realized_volatility(recent_hist['Close']) if 'Close' in recent_hist.columns else None
+            momentum = self._calculate_momentum(recent_hist['Close']) if 'Close' in recent_hist.columns else None
+            volume_ratio = self._calculate_volume_ratio(recent_hist['Volume']) if 'Volume' in recent_hist.columns else None
             
             market_data = MarketData(
                 symbol=symbol,
                 price=current_price,
                 change=change,
                 change_percent=change_percent,
-                volume=hist['Volume'].iloc[-1] if 'Volume' in hist.columns else 0,
+                volume=last_volume,
                 timestamp=datetime.now(),
-                market_status=self.market_monitor.get_market_status()
+                market_status=self.market_monitor.get_market_status(),
+                bid=float(bid) if bid else None,
+                ask=float(ask) if ask else None,
+                high=high,
+                low=low,
+                vwap=float(vwap) if vwap else None,
+                volatility=float(volatility) if volatility else None,
+                momentum=float(momentum) if momentum else None,
+                volume_ratio=float(volume_ratio) if volume_ratio else None
             )
             
             return market_data
             
         except Exception as e:
             self.logger.error(f"銘柄データ取得エラー {symbol}: {e}")
+            return None
+
+    def _calculate_vwap(self, hist: pd.DataFrame) -> Optional[float]:
+        """VWAPを計算"""
+        try:
+            if 'Close' not in hist.columns or 'Volume' not in hist.columns:
+                return None
+
+            volumes = hist['Volume'].fillna(0)
+            total_volume = volumes.sum()
+            if total_volume <= 0:
+                return None
+
+            vwap = (hist['Close'] * volumes).sum() / total_volume
+            return float(vwap)
+
+        except Exception as e:
+            self.logger.error(f"VWAP計算エラー: {e}")
+            return None
+
+    def _calculate_realized_volatility(self, prices: pd.Series) -> Optional[float]:
+        """実現ボラティリティを計算"""
+        try:
+            returns = prices.pct_change().dropna() * 100
+            if returns.empty:
+                return None
+            std = returns.std()
+            if pd.isna(std):
+                return None
+            return float(std)
+        except Exception as e:
+            self.logger.error(f"ボラティリティ計算エラー: {e}")
+            return None
+
+    def _calculate_momentum(self, prices: pd.Series) -> Optional[float]:
+        """モメンタムを計算"""
+        try:
+            if prices.empty:
+                return None
+            start_price = prices.iloc[0]
+            end_price = prices.iloc[-1]
+            if pd.isna(start_price) or start_price == 0:
+                return None
+            return float((end_price - start_price) / start_price * 100)
+        except Exception as e:
+            self.logger.error(f"モメンタム計算エラー: {e}")
+            return None
+
+    def _calculate_volume_ratio(self, volumes: pd.Series) -> Optional[float]:
+        """出来高の平均比率を計算"""
+        try:
+            if volumes.empty or len(volumes) < 2:
+                return None
+            baseline = volumes.iloc[:-1].mean()
+            current = volumes.iloc[-1]
+            if pd.isna(baseline) or baseline <= 0 or pd.isna(current):
+                return None
+            return float(current / baseline)
+        except Exception as e:
+            self.logger.error(f"出来高比率計算エラー: {e}")
             return None
     
     def _distribution_loop(self):
@@ -434,7 +524,17 @@ class WebSocketServer:
                 'change_percent': market_data.change_percent,
                 'volume': market_data.volume,
                 'timestamp': market_data.timestamp.isoformat(),
-                'market_status': market_data.market_status
+                'market_status': market_data.market_status,
+                'metrics': {k: v for k, v in {
+                    'bid': market_data.bid,
+                    'ask': market_data.ask,
+                    'high': market_data.high,
+                    'low': market_data.low,
+                    'vwap': market_data.vwap,
+                    'volatility': market_data.volatility,
+                    'momentum': market_data.momentum,
+                    'volume_ratio': market_data.volume_ratio
+                }.items() if v is not None}
             }
         })
         

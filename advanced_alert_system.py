@@ -10,7 +10,7 @@ import smtplib
 import threading
 import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Callable
+from typing import Dict, List, Optional, Any, Callable, Deque
 from dataclasses import dataclass, asdict
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -18,6 +18,8 @@ import requests
 from enum import Enum
 import sqlite3
 import os
+from collections import deque, defaultdict
+import statistics
 
 class AlertType(Enum):
     """アラートタイプ"""
@@ -28,6 +30,10 @@ class AlertType(Enum):
     TECHNICAL_SIGNAL = "technical_signal"
     NEWS_SENTIMENT = "news_sentiment"
     CUSTOM_CONDITION = "custom_condition"
+    VWAP_DEVIATION = "vwap_deviation"
+    VOLATILITY_SPIKE = "volatility_spike"
+    BID_ASK_SPREAD = "bid_ask_spread"
+    MOMENTUM_SHIFT = "momentum_shift"
 
 class AlertSeverity(Enum):
     """アラート重要度"""
@@ -44,6 +50,7 @@ class NotificationChannel(Enum):
     WEBHOOK = "webhook"
     DESKTOP = "desktop"
     SMS = "sms"
+    LINE = "line"
 
 @dataclass
 class AlertCondition:
@@ -130,6 +137,10 @@ class NotificationService:
                         'webhook_url': '',
                         'enabled': False
                     },
+                    'line': {
+                        'token': '',
+                        'enabled': False
+                    },
                     'desktop': {
                         'enabled': True
                     }
@@ -152,6 +163,8 @@ class NotificationService:
                 return await self._send_desktop(message, alert_trigger)
             elif channel == NotificationChannel.WEBHOOK:
                 return await self._send_webhook(message, alert_trigger)
+            elif channel == NotificationChannel.LINE:
+                return await self._send_line(message, alert_trigger)
             else:
                 self.logger.warning(f"未対応の通知チャネル: {channel}")
                 return False
@@ -294,6 +307,45 @@ class NotificationService:
             
         except Exception as e:
             self.logger.error(f"Discord送信エラー: {e}")
+            return False
+
+    async def _send_line(self, message: str, alert_trigger: AlertTrigger) -> bool:
+        """LINE Notify に通知を送信"""
+        try:
+            line_config = self.config.get('line', {})
+            if not line_config.get('enabled', False):
+                return False
+
+            token = line_config.get('token')
+            if not token:
+                self.logger.warning("LINE通知トークンが設定されていません")
+                return False
+
+            severity_emoji = {
+                AlertSeverity.LOW: "🟡",
+                AlertSeverity.MEDIUM: "🟠",
+                AlertSeverity.HIGH: "🔴",
+                AlertSeverity.CRITICAL: "🚨"
+            }
+
+            emoji = severity_emoji.get(alert_trigger.severity, "🔔")
+            payload = {
+                'message': f"{emoji} {alert_trigger.symbol} ({alert_trigger.alert_type.value})\n{message}\n閾値: {alert_trigger.threshold_value}\n現在値: {alert_trigger.current_value}"
+            }
+
+            response = requests.post(
+                'https://notify-api.line.me/api/notify',
+                headers={'Authorization': f'Bearer {token}'},
+                data=payload,
+                timeout=10
+            )
+            response.raise_for_status()
+
+            self.logger.info(f"LINE通知送信完了: {alert_trigger.symbol}")
+            return True
+
+        except Exception as e:
+            self.logger.error(f"LINE送信エラー: {e}")
             return False
     
     async def _send_desktop(self, message: str, alert_trigger: AlertTrigger) -> bool:
@@ -591,7 +643,13 @@ class AdvancedAlertSystem:
         
         # コールバック
         self.alert_callbacks = []
-        
+
+        # リアルタイムスナップショット
+        self.realtime_snapshots: Dict[str, Dict[str, Any]] = {}
+        self.realtime_history: Dict[str, Deque[Dict[str, Any]]] = defaultdict(lambda: deque(maxlen=600))
+        self.snapshot_ttl = timedelta(seconds=30)
+        self.snapshot_lock = threading.Lock()
+
         # ルールを読み込み
         self._load_rules()
     
@@ -645,6 +703,23 @@ class AdvancedAlertSystem:
     def update_data_source(self, symbol: str, data_source: Callable[[], Dict[str, Any]]):
         """データソースを更新"""
         self.data_sources[symbol] = data_source
+
+    def update_market_snapshot(self, symbol: str, snapshot: Dict[str, Any], timestamp: Optional[datetime] = None):
+        """外部からのリアルタイムデータを取り込み"""
+        try:
+            ts = timestamp or datetime.now()
+
+            enriched_snapshot = dict(snapshot)
+            enriched_snapshot.setdefault('symbol', symbol)
+            enriched_snapshot['timestamp'] = ts
+
+            with self.snapshot_lock:
+                self.realtime_snapshots[symbol] = enriched_snapshot
+                history = self.realtime_history[symbol]
+                history.append(dict(enriched_snapshot))
+
+        except Exception as e:
+            self.logger.error(f"スナップショット更新エラー: {e}")
     
     def start_monitoring(self):
         """監視を開始"""
@@ -710,13 +785,17 @@ class AdvancedAlertSystem:
                 data = self._get_symbol_data(condition.symbol)
                 if not data:
                     continue
-                
+
                 # 条件をチェック
-                if self._evaluate_condition(condition, data):
+                history = self._get_symbol_history(condition.symbol)
+                evaluated_value = self._evaluate_condition(condition, data, history)
+                if evaluated_value is not None:
                     return {
                         'condition': condition,
                         'data': data,
-                        'rule': rule
+                        'rule': rule,
+                        'current_value': evaluated_value,
+                        'history': history
                     }
             
             return None
@@ -728,6 +807,15 @@ class AdvancedAlertSystem:
     def _get_symbol_data(self, symbol: str) -> Optional[Dict[str, Any]]:
         """銘柄データを取得"""
         try:
+            with self.snapshot_lock:
+                snapshot = self.realtime_snapshots.get(symbol)
+                if snapshot:
+                    snapshot_ts = snapshot.get('timestamp')
+                    if not isinstance(snapshot_ts, datetime):
+                        snapshot_ts = datetime.now()
+                    if datetime.now() - snapshot_ts <= self.snapshot_ttl:
+                        return dict(snapshot)
+
             if symbol in self.data_sources:
                 return self.data_sources[symbol]()
             else:
@@ -753,47 +841,198 @@ class AdvancedAlertSystem:
         except Exception as e:
             self.logger.error(f"データ取得エラー {symbol}: {e}")
             return None
+
+    def _get_symbol_history(self, symbol: str) -> List[Dict[str, Any]]:
+        """銘柄のリアルタイム履歴を取得"""
+        with self.snapshot_lock:
+            history = self.realtime_history.get(symbol)
+            if not history:
+                return []
+            return list(history)
     
-    def _evaluate_condition(self, condition: AlertCondition, data: Dict[str, Any]) -> bool:
-        """条件を評価"""
+    def _evaluate_condition(
+        self,
+        condition: AlertCondition,
+        data: Dict[str, Any],
+        history: List[Dict[str, Any]]
+    ) -> Optional[float]:
+        """条件を評価し、閾値を満たした場合は現在値を返す"""
         try:
-            # 現在値を取得
-            if condition.alert_type == AlertType.PRICE_ABOVE:
-                current_value = data.get('price', 0)
-            elif condition.alert_type == AlertType.PRICE_BELOW:
-                current_value = data.get('price', 0)
-            elif condition.alert_type == AlertType.PRICE_CHANGE_PERCENT:
-                current_value = data.get('change_percent', 0)
-            elif condition.alert_type == AlertType.VOLUME_SPIKE:
-                current_value = data.get('volume', 0)
+            alert_type = condition.alert_type
+            current_value: Optional[float] = None
+
+            if alert_type in {AlertType.PRICE_ABOVE, AlertType.PRICE_BELOW}:
+                current_value = float(data.get('price', 0))
+            elif alert_type == AlertType.PRICE_CHANGE_PERCENT:
+                current_value = float(data.get('change_percent', 0))
+            elif alert_type == AlertType.VOLUME_SPIKE:
+                current_value = self._calculate_volume_rate(data, history, condition.time_window)
+            elif alert_type == AlertType.VWAP_DEVIATION:
+                current_value = self._calculate_vwap_deviation(data, history, condition.time_window)
+            elif alert_type == AlertType.VOLATILITY_SPIKE:
+                current_value = self._calculate_volatility(history, condition.time_window)
+            elif alert_type == AlertType.BID_ASK_SPREAD:
+                bid = data.get('bid')
+                ask = data.get('ask')
+                if bid and ask and bid > 0:
+                    current_value = ((ask - bid) / bid) * 100
+            elif alert_type == AlertType.MOMENTUM_SHIFT:
+                current_value = self._calculate_momentum(history, condition.time_window)
             else:
-                current_value = 0
-            
-            # 比較演算子で評価
-            if condition.comparison_operator == '>':
-                return current_value > condition.threshold_value
-            elif condition.comparison_operator == '<':
-                return current_value < condition.threshold_value
-            elif condition.comparison_operator == '>=':
-                return current_value >= condition.threshold_value
-            elif condition.comparison_operator == '<=':
-                return current_value <= condition.threshold_value
-            elif condition.comparison_operator == '==':
-                return abs(current_value - condition.threshold_value) < 0.01
-            elif condition.comparison_operator == '!=':
-                return abs(current_value - condition.threshold_value) >= 0.01
+                current_value = float(data.get('price', 0))
+
+            if current_value is None:
+                return None
+
+            operator = condition.comparison_operator
+            threshold = condition.threshold_value
+
+            if operator == '>':
+                matched = current_value > threshold
+            elif operator == '<':
+                matched = current_value < threshold
+            elif operator == '>=':
+                matched = current_value >= threshold
+            elif operator == '<=':
+                matched = current_value <= threshold
+            elif operator == '==':
+                matched = abs(current_value - threshold) < 1e-6
+            elif operator == '!=':
+                matched = abs(current_value - threshold) >= 1e-6
             else:
-                return False
-                
+                matched = False
+
+            return current_value if matched else None
+
         except Exception as e:
             self.logger.error(f"条件評価エラー: {e}")
-            return False
+            return None
+
+    def _filter_history(self, history: List[Dict[str, Any]], minutes: int) -> List[Dict[str, Any]]:
+        """指定時間内の履歴を抽出"""
+        if not history:
+            return []
+
+        if not minutes or minutes <= 0:
+            return history
+
+        cutoff = datetime.now() - timedelta(minutes=minutes)
+        filtered = []
+        for entry in history:
+            ts = entry.get('timestamp')
+            if isinstance(ts, datetime) and ts >= cutoff:
+                filtered.append(entry)
+        return filtered
+
+    def _calculate_volume_rate(
+        self,
+        data: Dict[str, Any],
+        history: List[Dict[str, Any]],
+        time_window: int
+    ) -> Optional[float]:
+        """出来高の急増率または現在出来高を計算"""
+        current_volume = data.get('volume')
+        if current_volume is None:
+            return None
+
+        if not time_window or time_window <= 0:
+            return float(current_volume)
+
+        window = self._filter_history(history, time_window)
+        volumes = [entry.get('volume') for entry in window if entry.get('volume') is not None]
+        if len(volumes) < 2:
+            return float(current_volume)
+
+        baseline = sum(volumes[:-1]) / max(len(volumes) - 1, 1)
+        if baseline <= 0:
+            return float(current_volume)
+
+        return float(current_volume) / baseline
+
+    def _calculate_vwap_deviation(
+        self,
+        data: Dict[str, Any],
+        history: List[Dict[str, Any]],
+        time_window: int
+    ) -> Optional[float]:
+        """現在価格とVWAPの乖離率を計算"""
+        price = data.get('price')
+        if not price:
+            return None
+
+        vwap = data.get('vwap')
+
+        if vwap is None:
+            window = self._filter_history(history, time_window or 15)
+            total_volume = 0.0
+            weighted_price = 0.0
+
+            for entry in window:
+                vol = entry.get('volume')
+                p = entry.get('price')
+                if vol is not None and p is not None:
+                    total_volume += vol
+                    weighted_price += vol * p
+
+            if total_volume > 0:
+                vwap = weighted_price / total_volume
+
+        if not vwap or vwap == 0:
+            return None
+
+        return ((price - vwap) / vwap) * 100
+
+    def _calculate_volatility(
+        self,
+        history: List[Dict[str, Any]],
+        time_window: int
+    ) -> Optional[float]:
+        """時間窓内の実現ボラティリティ (パーセント) を計算"""
+        window = self._filter_history(history, time_window or 10)
+        prices = [entry.get('price') for entry in window if entry.get('price') is not None]
+
+        if len(prices) < 2:
+            return None
+
+        returns = []
+        for prev, curr in zip(prices[:-1], prices[1:]):
+            if prev and prev != 0:
+                returns.append((curr - prev) / prev * 100)
+
+        if len(returns) < 2:
+            return None
+
+        try:
+            return statistics.pstdev(returns)
+        except statistics.StatisticsError:
+            return None
+
+    def _calculate_momentum(
+        self,
+        history: List[Dict[str, Any]],
+        time_window: int
+    ) -> Optional[float]:
+        """時間窓内の価格モメンタム (パーセント) を計算"""
+        window = self._filter_history(history, time_window or 5)
+        prices = [entry.get('price') for entry in window if entry.get('price') is not None]
+
+        if len(prices) < 2:
+            return None
+
+        start_price = prices[0]
+        end_price = prices[-1]
+
+        if not start_price or start_price == 0:
+            return None
+
+        return ((end_price - start_price) / start_price) * 100
     
     def _trigger_alert(self, rule: AlertRule, trigger_data: Dict[str, Any]):
         """アラートを発火"""
         try:
             condition = trigger_data['condition']
             data = trigger_data['data']
+            current_value = trigger_data.get('current_value', data.get('price', 0))
             
             # アラート発火を作成
             trigger_id = f"{rule.id}_{condition.symbol}_{int(time.time())}"
@@ -804,14 +1043,16 @@ class AdvancedAlertSystem:
                 symbol=condition.symbol,
                 alert_type=condition.alert_type,
                 condition=condition.condition,
-                current_value=data.get('price', 0),
+                current_value=current_value,
                 threshold_value=condition.threshold_value,
                 severity=rule.severity,
-                message=f"{condition.symbol} で {condition.condition} 条件が満たされました",
+                message=f"{condition.symbol} で {condition.condition} 条件が満たされました (現在値: {round(current_value, 4)})",
                 timestamp=datetime.now(),
                 metadata={
                     'rule_name': rule.name,
-                    'data': data
+                    'data': data,
+                    'current_value': current_value,
+                    'history_size': len(trigger_data.get('history', []))
                 }
             )
             

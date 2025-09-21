@@ -4,10 +4,14 @@ Tests for Real-time Manager Module
 
 import unittest
 import asyncio
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from datetime import datetime, timedelta
 import sys
 import os
+try:
+    import pandas as pd
+except ImportError:  # pragma: no cover - optional dependency for tests
+    pd = None
 
 # Add parent directory to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -145,18 +149,22 @@ class TestRealTimeDataManager(unittest.TestCase):
         self.manager.stop_monitoring()
         self.assertFalse(self.manager.is_running)
     
+    @unittest.skipUnless(pd is not None, "pandas is required for this test")
     @patch('yfinance.Ticker')
     def test_fetch_symbol_data(self, mock_ticker):
         """Test fetching symbol data"""
-        # Mock ticker data
-        mock_data = MagicMock()
-        mock_data.empty = False
-        mock_data.__getitem__.return_value = MagicMock()
-        mock_data.__getitem__.return_value.iloc = MagicMock()
-        mock_data.__getitem__.return_value.iloc.__getitem__.return_value = 100
-        
-        mock_info = {'previousClose': 99}
-        
+        # Mock ticker data with realistic dataframe
+        index = pd.date_range(end=datetime.now(), periods=4, freq='min')
+        mock_data = pd.DataFrame({
+            'Close': [98.5, 99.8, 100.5, 101.2],
+            'Open': [98.0, 99.0, 100.0, 100.8],
+            'High': [99.0, 100.0, 101.0, 101.5],
+            'Low': [97.5, 98.8, 99.5, 100.5],
+            'Volume': [100000, 120000, 150000, 170000]
+        }, index=index)
+
+        mock_info = {'previousClose': 99.0, 'bid': 100.0, 'ask': 101.0}
+
         mock_ticker_instance = Mock()
         mock_ticker_instance.info = mock_info
         mock_ticker_instance.history.return_value = mock_data
@@ -168,6 +176,10 @@ class TestRealTimeDataManager(unittest.TestCase):
         self.assertIsInstance(data, MarketData)
         self.assertEqual(data.symbol, '7203.T')
         self.assertEqual(data.price, 100)
+        self.assertIsNotNone(data.vwap)
+        self.assertIsNotNone(data.volatility)
+        self.assertIsNotNone(data.momentum)
+        self.assertIsNotNone(data.volume_ratio)
     
     @patch('yfinance.Ticker')
     def test_fetch_symbol_data_empty(self, mock_ticker):

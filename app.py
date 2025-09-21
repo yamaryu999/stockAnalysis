@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import os
 from pathlib import Path
+from html import escape
 
 NAV_ITEMS = [
     ("🏠 ダッシュボード", "dashboard"),
@@ -21,6 +22,23 @@ NAV_ITEMS = [
 
 NAV_LABEL_TO_KEY = {label: key for label, key in NAV_ITEMS}
 NAV_KEY_TO_LABEL = {key: label for label, key in NAV_ITEMS}
+
+
+def trigger_rerun() -> None:
+    """Streamlitの再レンダリングをAPI差異を吸収しつつ実行"""
+    rerun_fn = getattr(st, "rerun", None)
+    if callable(rerun_fn):
+        rerun_fn()
+        return
+
+    experimental_rerun = getattr(st, "experimental_rerun", None)
+    if callable(experimental_rerun):
+        experimental_rerun()
+        return
+
+    logger_ref = globals().get("logger")
+    if logger_ref:
+        logger_ref.warning("Streamlit rerun API が利用できません")
 
 # 安全なインポート処理
 try:
@@ -38,6 +56,7 @@ try:
     
     # リアルタイム機能をインポート
     from realtime_manager import realtime_manager, alert_manager, notification_manager, MarketData
+    from realtime_alert_bridge import ensure_bridge
     from websocket_client import streamlit_realtime_manager
     
     # 強化されたAI機能をインポート
@@ -79,6 +98,9 @@ try:
     
     # ロガーの設定
     logger = get_logger(__name__)
+
+    # リアルタイムアラートブリッジを初期化
+    ensure_bridge()
     
 except ImportError as e:
     st.error(f"モジュールのインポートエラー: {e}")
@@ -635,6 +657,26 @@ def load_ui_refresh_styles():
 load_improved_styles()
 load_ui_refresh_styles()
 
+st.markdown(
+    """
+    <style>
+    .headline-list a {
+        color: #60a5fa;
+        text-decoration: none;
+    }
+    .headline-list a:hover {
+        text-decoration: underline;
+    }
+    .news-source-label {
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 0.85em;
+        margin-left: 4px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 try:
     database_manager = DatabaseManager()
 except Exception:
@@ -809,7 +851,7 @@ def render_quick_actions():
         )
         if st.button("📰 ニュースページへ", help="ニュース駆動スコアを確認", key="quick_news"):
             set_active_page("📰 ニュース分析")
-            st.experimental_rerun()
+            trigger_rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
 
@@ -971,11 +1013,11 @@ def render_sidebar():
         with quick_col1:
             if st.button("🚀 ダッシュボード", key="sidebar_quick_dashboard"):
                 set_active_page("🏠 ダッシュボード")
-                st.experimental_rerun()
+                trigger_rerun()
         with quick_col2:
             if st.button("📰 ニュース", key="sidebar_quick_news"):
                 set_active_page("📰 ニュース分析")
-                st.experimental_rerun()
+                trigger_rerun()
 
         st.divider()
         st.markdown("### 表示設定")
@@ -1105,24 +1147,44 @@ def render_news_insights_page():
         st.session_state['news_autogen_done'] = True
 
     if trigger_generate:
+        status_box = st.empty()
+        progress_bar = st.progress(0)
+        status_box.info("対象銘柄を抽出しています…")
+
         raw_symbols = [s.strip().upper() for s in symbols_text.split(',') if s.strip()]
         effective_symbols = raw_symbols
         if not effective_symbols:
-            effective_symbols = news_signal_engine.discover_trending_symbols(  # type: ignore
-                top_n=20,
-                lookback_days=lookback,
-            )
+            try:
+                effective_symbols = news_signal_engine.discover_trending_symbols(  # type: ignore
+                    top_n=20,
+                    lookback_days=lookback,
+                )
+            except Exception as discover_error:  # noqa: BLE001
+                st.error(f"注目銘柄の抽出に失敗しました: {discover_error}")
+                effective_symbols = []
 
-        with st.spinner("ニュースを解析しています..."):
+        if not effective_symbols:
+            progress_bar.empty()
+            status_box.warning("解析対象となる銘柄が見つかりませんでした。銘柄を指定するか期間を延ばしてください。")
+        else:
+            progress_bar.progress(35)
+            status_box.info(f"ニュースを収集しています… ({len(effective_symbols)}銘柄)")
+
             try:
                 signals = news_signal_engine.generate_news_signals(  # type: ignore
                     effective_symbols,
                     lookback_days=lookback,
                     min_confidence=min_confidence,
                 )
+                progress_bar.progress(80)
+                status_box.info("センチメントを評価しています…")
             except Exception as e:  # noqa: BLE001
                 st.error(f"ニュース解析でエラーが発生しました: {e}")
                 signals = []
+
+            progress_bar.progress(100)
+            progress_bar.empty()
+            status_box.empty()
 
         if not signals:
             st.warning("最新ニュースから候補が見つかりませんでした。期間を延ばすかキーワードを調整してください。")
@@ -1138,12 +1200,30 @@ def render_news_insights_page():
         return
     used_symbols = st.session_state.get('news_symbols_used')
     if used_symbols:
-        st.caption(f"分析対象: {', '.join(used_symbols[:10])}")
+        label_map = {
+            signal.get('symbol'): signal.get('company_name')
+            for signal in signals
+            if signal.get('symbol')
+        }
+        formatted_targets = []
+        for sym in used_symbols[:10]:
+            name = label_map.get(sym)
+            formatted_targets.append(f"{name} ({sym})" if name else sym)
+        if formatted_targets:
+            st.caption(f"分析対象: {', '.join(formatted_targets)}")
 
     df = pd.DataFrame(signals)
+    if 'company_name' not in df:
+        df['company_name'] = None
+
+    df['銘柄'] = df.apply(
+        lambda row: f"{row['company_name']} ({row['symbol']})" if row.get('company_name') else row.get('symbol'),
+        axis=1,
+    )
+
     df_display = df[
         [
-            'symbol',
+            '銘柄',
             'composite_score',
             'news_sentiment',
             'news_intensity',
@@ -1153,7 +1233,7 @@ def render_news_insights_page():
             'news_count',
         ]
     ].copy()
-    df_display.rename(columns={'symbol': '銘柄', 'composite_score': '総合スコア'}, inplace=True)
+    df_display.rename(columns={'composite_score': '総合スコア'}, inplace=True)
     st.dataframe(df_display, use_container_width=True)
 
     candidates = []
@@ -1168,11 +1248,23 @@ def render_news_insights_page():
         grid_html = []
         for cand in candidates:
             tags = ''.join(f"<span class='event-chip'>{tag}</span>" for tag in cand.get('event_tags', [])[:3])
-            headline = cand.get('headlines', [''])[0]
+            top_articles = cand.get('top_articles') or []
+            if top_articles:
+                top_article = top_articles[0]
+                headline_title = escape(top_article.get('title', ''))
+                headline_url = top_article.get('url') or ''
+                if headline_url:
+                    headline = f"<a href='{headline_url}' target='_blank' rel='noopener noreferrer'>{headline_title}</a>"
+                else:
+                    headline = headline_title
+            else:
+                headline_text = cand.get('headlines', [''])[0]
+                headline = escape(headline_text) if headline_text else ''
+            display_symbol = f"{cand.get('company_name')} ({cand['symbol']})" if cand.get('company_name') else cand['symbol']
             grid_html.append(
                 f"""
                 <div class='recommendation-card'>
-                    <div class='recommendation-card__symbol'>{cand['symbol']}</div>
+                    <div class='recommendation-card__symbol'>{display_symbol}</div>
                     <div class='recommendation-card__meta'>
                         <span class='recommendation-card__score'>総合 {cand['final_score']:.1f}</span>
                         <span>5日変化 {cand['price_change_pct']:.1f}%</span>
@@ -1190,7 +1282,11 @@ def render_news_insights_page():
 
     st.markdown("### 🔎 ハイライト")
     for signal in signals[: min(5, len(signals))]:
-        header = f"{signal['symbol']}｜総合スコア {signal['composite_score']:.1f}" if signal.get('symbol') else "シグナル詳細"
+        if signal.get('symbol'):
+            name_part = f"{signal['company_name']} ({signal['symbol']})" if signal.get('company_name') else signal['symbol']
+            header = f"{name_part}｜総合スコア {signal['composite_score']:.1f}"
+        else:
+            header = "シグナル詳細"
         with st.expander(header):
             st.write(
                 f"**センチメント:** {signal['news_sentiment']:.2f}  /  **ニュース勢い:** {signal['news_momentum']:.2f}  /  **ファンダ傾向:** {signal['fundamental_tilt']:.2f}"
@@ -1205,10 +1301,26 @@ def render_news_insights_page():
                 chips = ''.join(f"<span class='event-chip'>{tag}</span>" for tag in event_tags)
                 st.markdown(f"<div class='event-chip-group'>{chips}</div>", unsafe_allow_html=True)
 
-            headlines = signal.get('headlines', [])
-            if headlines:
-                items = ''.join(f"<li>{headline}</li>" for headline in headlines)
-                st.markdown(f"<ul class='headline-list'>{items}</ul>", unsafe_allow_html=True)
+            top_articles = signal.get('top_articles') or []
+            if top_articles:
+                items = []
+                for article in top_articles:
+                    title = escape(article.get('title', ''))
+                    url = article.get('url') or ''
+                    source = escape(article.get('source', '') or '')
+                    source_html = f" <span class='news-source-label'>({source})</span>" if source else ''
+                    if url:
+                        items.append(
+                            f"<li><a href='{url}' target='_blank' rel='noopener noreferrer'>{title}</a>{source_html}</li>"
+                        )
+                    else:
+                        items.append(f"<li>{title}{source_html}</li>")
+                st.markdown(f"<ul class='headline-list'>{''.join(items)}</ul>", unsafe_allow_html=True)
+            else:
+                headlines = signal.get('headlines', [])
+                if headlines:
+                    items = ''.join(f"<li>{escape(headline)}</li>" for headline in headlines)
+                    st.markdown(f"<ul class='headline-list'>{items}</ul>", unsafe_allow_html=True)
 
 # スクリーニングページ
 def render_screening_page():
