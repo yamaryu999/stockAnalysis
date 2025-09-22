@@ -131,6 +131,27 @@ streamlit run app.py
 - **データ取得エラー**: 個別銘柄のエラーを適切に処理
 - **フォールバック機能**: エラー時の代替データ提供
 
+## 🧪 PlaywrightによるE2Eテスト
+
+1. 依存関係をインストール
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Playwrightのブラウザバイナリを準備
+   ```bash
+   python -m playwright install --with-deps
+   ```
+3. 別ターミナルでStreamlitアプリを起動
+   ```bash
+   streamlit run app.py
+   ```
+4. テストを実行（デフォルトURLは `http://localhost:8501`）
+   ```bash
+   pytest -m playwright --app-url http://localhost:8501
+   ```
+
+CLIオプション `--app-url` または環境変数 `APP_URL` を使って検証対象のエンドポイントを切り替えられます。
+
 ## 📝 ライセンス
 
 このプロジェクトはMITライセンスの下で公開されています。

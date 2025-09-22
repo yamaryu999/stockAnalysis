@@ -14,6 +14,9 @@ pyyaml>=6.0                # 設定ファイル
 matplotlib>=3.8.2         # チャート作成（stock_analyzer.pyで使用）
 selenium>=4.15.0           # MCP Browser機能（browser_mcp_client.pyで使用）
 webdriver-manager>=4.0.1   # MCP Browser機能（browser_mcp_client.pyで使用）
+pytest>=7.4.0              # テストランナー
+playwright>=1.45.0         # E2Eテスト自動化（Playwrightサポート）
+pytest-playwright>=0.5.4   # Playwright用Pytestプラグイン
 
 # 削除された依存関係（使用されていない）
 # seaborn>=0.13.0          # 使用されていない
