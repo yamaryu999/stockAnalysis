@@ -1,6 +1,8 @@
 # 日本株価分析ツール 📈
 
 [![E2E Playwright](https://github.com/yamaryu999/stockAnalysis/actions/workflows/e2e-playwright.yml/badge.svg)](https://github.com/yamaryu999/stockAnalysis/actions/workflows/e2e-playwright.yml)
+[![Unit Tests](https://github.com/yamaryu999/stockAnalysis/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/yamaryu999/stockAnalysis/actions/workflows/unit-tests.yml)
+[![Build](https://github.com/yamaryu999/stockAnalysis/actions/workflows/build.yml/badge.svg)](https://github.com/yamaryu999/stockAnalysis/actions/workflows/build.yml)
 
 東京証券取引所の全銘柄を分析し、AI推奨機能付きの株価分析ツールです。
 
