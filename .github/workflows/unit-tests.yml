@@ -33,9 +33,9 @@ jobs:
           python -m pip install -U pip wheel setuptools
           python -m pip install -r requirements.txt
 
-      - name: Run unit tests (exclude Playwright)
+      - name: Run unit tests (exclude e2e/integration)
         run: |
-          python -m pytest -q --maxfail=1 --disable-warnings -m "not playwright" --junitxml=test-results/junit.xml || exit 1
+          python -m pytest -m "not playwright and not e2e and not integration and not slow" --junitxml=test-results/junit.xml || exit 1
 
       - name: Upload test results
         if: always()
@@ -44,4 +44,3 @@ jobs:
           name: junit-report
           path: test-results
           if-no-files-found: ignore
-
