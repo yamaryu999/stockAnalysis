@@ -92,7 +92,23 @@ class NewsAnalyzer:
     def get_sector_news(self, sector: str, days_back: int = 7) -> Dict:
         """セクター別ニュース取得"""
         try:
-            # セクターキーワードマッピング
+            # モックサーバーが指定されている場合は優先
+            mock_base = os.getenv('NEWS_MOCK_URL')
+            if mock_base:
+                try:
+                    resp = self.session.get(
+                        mock_base.rstrip('/') + '/sector',
+                        params={'sector': sector, 'days_back': days_back},
+                        timeout=5,
+                    )
+                    resp.raise_for_status()
+                    data = resp.json()
+                    if isinstance(data, dict) and 'news_count' in data:
+                        return data
+                except Exception:
+                    pass
+
+            # セクターキーワードマッピング（実データ）
             sector_keywords = {
                 'technology': ['テクノロジー', 'IT', 'ソフトウェア', 'ハードウェア', 'AI', '人工知能', 'technology', 'software'],
                 'finance': ['金融', '銀行', '保険', '証券', '投資', 'finance', 'banking', 'investment'],
@@ -125,6 +141,21 @@ class NewsAnalyzer:
     def get_economic_indicators(self) -> Dict:
         """経済指標の取得と分析"""
         try:
+            # モックサーバーが指定されている場合は優先
+            mock_base = os.getenv('NEWS_MOCK_URL')
+            if mock_base:
+                try:
+                    resp = self.session.get(
+                        mock_base.rstrip('/') + '/indicators',
+                        timeout=5,
+                    )
+                    resp.raise_for_status()
+                    data = resp.json()
+                    if isinstance(data, dict) and data:
+                        return data
+                except Exception:
+                    pass
+
             indicators = {}
             
             # 日経平均関連ニュース

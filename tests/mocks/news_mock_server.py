@@ -60,6 +60,38 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(payload)
                 return
 
+            if parsed.path == "/sector":
+                qs = parse_qs(parsed.query)
+                sector = (qs.get("sector") or ["technology"])[0]
+                resp = {
+                    "sector": sector,
+                    "sentiment": {"score": 0.35, "sentiment": "positive", "confidence": 0.8},
+                    "keywords": {"keywords": ["ai", "software", "cloud"], "frequency": {"ai": 10, "software": 8, "cloud": 7}},
+                    "news_count": 12,
+                    "confidence": 0.8,
+                }
+                payload = json.dumps(resp).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Content-Length", str(len(payload)))
+                self.end_headers()
+                self.wfile.write(payload)
+                return
+
+            if parsed.path == "/indicators":
+                resp = {
+                    "nikkei_sentiment": {"score": 0.1, "sentiment": "neutral", "confidence": 0.5},
+                    "fx_sentiment": {"score": -0.2, "sentiment": "negative", "confidence": 0.6},
+                    "interest_sentiment": {"score": 0.3, "sentiment": "positive", "confidence": 0.7},
+                }
+                payload = json.dumps(resp).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Content-Length", str(len(payload)))
+                self.end_headers()
+                self.wfile.write(payload)
+                return
+
             self.send_response(404)
             self.end_headers()
         except Exception:
@@ -81,4 +113,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
