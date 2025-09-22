@@ -157,6 +157,16 @@ streamlit run app.py
 
 CLIオプション `--app-url` または環境変数 `APP_URL` を使って検証対象のエンドポイントを切り替えられます。
 
+### CI でのテスト構成
+- Build: 依存関係インストールとバイトコードコンパイル
+- Unit Tests: `not playwright and not e2e and not integration and not slow`
+- E2E Playwright: アプリ起動後にUIのスモークを実行（トレース保存）
+- Integration & Slow（夜間/手動）:
+  - 既定では WebSocket サーバーのみ起動（`START_WEBSOCKET=true`）
+  - 必要に応じて環境変数で制御:
+    - `START_STREAMLIT=true`（Streamlit を同時起動しHTTPヘルスチェック）
+    - `START_MCP=true`（MCP Browser Server を起動）
+
 ## 📝 ライセンス
 
 このプロジェクトはMITライセンスの下で公開されています。
