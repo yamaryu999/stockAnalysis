@@ -4,6 +4,7 @@
 """
 
 import requests
+import os
 from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
@@ -13,6 +14,7 @@ import re
 import time
 import json
 from urllib.parse import urljoin, urlparse
+from xml.etree import ElementTree as ET
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -26,6 +28,7 @@ class NewsAnalyzer:
         })
         self.cache = {}
         self.cache_duration = 3600  # 1時間
+        self._company_cache: Dict[str, Optional[str]] = {}
         
         # センチメント分析用の辞書
         self.positive_words = {
@@ -184,7 +187,13 @@ class NewsAnalyzer:
                 key=lambda item: (item['news_count'], item['sentiment_score']),
                 reverse=True,
             )
-            return [item['symbol'] for item in trending[:top_n]]
+            if trending:
+                return [item['symbol'] for item in trending[:top_n]]
+
+            if candidates:
+                return candidates[:top_n]
+
+            return ['7203.T', '6758.T', '9984.T'][:top_n]
 
         except Exception as e:
             print(f"トレンド銘柄抽出エラー: {e}")
@@ -193,6 +202,22 @@ class NewsAnalyzer:
     def _fetch_comprehensive_news(self, symbol: str, days_back: int) -> List[Dict]:
         """包括的なニュース取得"""
         try:
+            # モックサーバーが指定されている場合は優先
+            mock_base = os.getenv('NEWS_MOCK_URL')
+            if mock_base:
+                try:
+                    resp = self.session.get(
+                        mock_base.rstrip('/') + '/news',
+                        params={'symbol': symbol, 'days_back': days_back},
+                        timeout=5,
+                    )
+                    resp.raise_for_status()
+                    data = resp.json()
+                    if isinstance(data, list):
+                        return data
+                except Exception:
+                    # フォールバックして実データへ
+                    pass
             # キャッシュをチェック
             cache_key = f"{symbol}_{days_back}"
             if cache_key in self.cache:
@@ -230,60 +255,109 @@ class NewsAnalyzer:
         """Yahoo Finance ニュース取得"""
         try:
             import yfinance as yf
-            
+
             ticker = yf.Ticker(symbol)
-            news = ticker.news
-            
-            news_data = []
+            news = ticker.news or []
+
+            news_data: List[Dict] = []
             for article in news[:15]:  # 最新15件
-                if article.get('title') and article.get('summary'):
-                    news_data.append({
-                        'title': article['title'],
-                        'summary': article['summary'],
-                        'published': article.get('providerPublishTime', 0),
-                        'source': 'Yahoo Finance',
-                        'url': article.get('link', ''),
-                        'provider': article.get('provider', 'Yahoo')
-                    })
-            
+                content = article.get('content') if isinstance(article, dict) else None
+
+                title = None
+                summary = ''
+                url = ''
+                provider = 'Yahoo'
+                published_raw = None
+
+                if isinstance(content, dict):
+                    title = content.get('title') or article.get('title')
+                    summary = content.get('summary') or content.get('description') or ''
+                    canonical = content.get('canonicalUrl') or {}
+                    if isinstance(canonical, dict):
+                        url = canonical.get('url', '')
+                    if not url:
+                        click_through = content.get('clickThroughUrl') or {}
+                        if isinstance(click_through, dict):
+                            url = click_through.get('url', '')
+                    provider_info = content.get('provider') or {}
+                    if isinstance(provider_info, dict):
+                        provider = provider_info.get('displayName', provider)
+                    published_raw = content.get('pubDate') or content.get('displayTime')
+                else:
+                    title = article.get('title')
+                    summary = article.get('summary') or ''
+                    url = article.get('link', '')
+                    provider = article.get('provider', 'Yahoo')
+                    published_raw = article.get('providerPublishTime')
+
+                if not title:
+                    continue
+
+                if not url:
+                    url = article.get('link', '') if isinstance(article, dict) else ''
+
+                if isinstance(published_raw, (int, float)):
+                    published_ts = int(published_raw)
+                else:
+                    published_dt = pd.to_datetime(published_raw, utc=True, errors='coerce')
+                    if pd.isna(published_dt):
+                        published_ts = int(time.time())
+                    else:
+                        published_ts = int(published_dt.timestamp())
+
+                news_data.append({
+                    'title': title,
+                    'summary': summary,
+                    'published': published_ts,
+                    'source': 'Yahoo Finance',
+                    'url': url,
+                    'provider': provider,
+                })
+
             return news_data
-            
+
         except Exception as e:
             print(f"Yahoo Finance ニュース取得エラー: {e}")
             return []
     
     def _fetch_google_news(self, symbol: str) -> List[Dict]:
-        """Google ニュース取得"""
+        """Google ニュース取得 (RSSベース)"""
         try:
-            # Google ニュース検索
             query = f"{symbol} 株価 ニュース"
-            url = f"https://news.google.com/search?q={query}&hl=ja&gl=JP&ceid=JP:ja"
-            
-            response = self.session.get(url, timeout=10)
+            rss_url = f"https://news.google.com/rss/search?q={requests.utils.quote(query)}&hl=ja&gl=JP&ceid=JP:ja"
+
+            response = self.session.get(rss_url, timeout=10)
             response.raise_for_status()
-            
-            soup = BeautifulSoup(response.content, 'html.parser')
-            articles = soup.find_all('article')[:10]  # 最新10件
-            
-            news_data = []
-            for article in articles:
-                title_elem = article.find('h3')
-                if title_elem:
-                    title = title_elem.get_text().strip()
-                    link_elem = title_elem.find('a')
-                    url = link_elem.get('href', '') if link_elem else ''
-                    
-                    news_data.append({
-                        'title': title,
-                        'summary': '',
-                        'published': int(time.time()),
-                        'source': 'Google News',
-                        'url': url,
-                        'provider': 'Google'
-                    })
-            
+
+            root = ET.fromstring(response.content)
+            channel = root.find('channel')
+            if channel is None:
+                return []
+
+            news_data: List[Dict] = []
+            for item in channel.findall('item')[:10]:  # 最新10件
+                title = item.findtext('title') or ''
+                link = item.findtext('link') or ''
+                description = item.findtext('description') or ''
+                pub_date = item.findtext('pubDate')
+
+                if not title:
+                    continue
+
+                published_dt = pd.to_datetime(pub_date, utc=True, errors='coerce')
+                published_ts = int(published_dt.timestamp()) if not pd.isna(published_dt) else int(time.time())
+
+                news_data.append({
+                    'title': title,
+                    'summary': BeautifulSoup(description, 'html.parser').get_text().strip(),
+                    'published': published_ts,
+                    'source': 'Google News',
+                    'url': link,
+                    'provider': 'Google',
+                })
+
             return news_data
-            
+
         except Exception as e:
             print(f"Google ニュース取得エラー: {e}")
             return []
@@ -627,7 +701,25 @@ class NewsAnalyzer:
         except Exception as e:
             print(f"重複除去エラー: {e}")
             return news_data
-    
+
+    def get_company_name(self, symbol: str) -> Optional[str]:
+        """外部公開用の企業名取得"""
+        if symbol in self._company_cache:
+            return self._company_cache[symbol]
+
+        name = self._get_company_name(symbol)
+        if not name:
+            try:
+                import yfinance as yf
+
+                info = yf.Ticker(symbol).info
+                name = info.get('shortName') or info.get('longName')
+            except Exception:
+                name = None
+
+        self._company_cache[symbol] = name
+        return name
+
     def _get_company_name(self, symbol: str) -> Optional[str]:
         """銘柄コードから企業名を取得"""
         try:

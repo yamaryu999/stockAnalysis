@@ -166,6 +166,14 @@ CLIオプション `--app-url` または環境変数 `APP_URL` を使って検�
   - 必要に応じて環境変数で制御:
     - `START_STREAMLIT=true`（Streamlit を同時起動しHTTPヘルスチェック）
     - `START_MCP=true`（MCP Browser Server を起動）
+    - `START_NEWS_MOCK=true`（ニュースAPIモックを起動し `NEWS_MOCK_URL` を注入）
+
+### ニュースAPIモックをローカルで起動
+```bash
+python tests/mocks/news_mock_server.py 9100 &
+export NEWS_MOCK_URL=http://localhost:9100
+```
+NewsAnalyzer は `NEWS_MOCK_URL` が設定されている場合、外部サイトの代わりにモックの `/news` を利用します。
 
 ## 📝 ライセンス
 
